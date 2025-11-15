@@ -30,6 +30,20 @@
                         </div>
 
                         <div>
+                            <label for="kategori" class="block text-sm font-medium text-gray-700 mb-1">
+                                Pilih Kategori
+                            </label>
+                            <select id="kategori" name="kategori" class="w-full border-gray-300 rounded-md shadow-sm">
+                                <option value="Pencurian" {{ $laporan->kategori == 'Pencurian' ? 'selected' : '' }}>Pencurian</option>
+                                <option value="Tawuran" {{ $laporan->kategori == 'Tawuran' ? 'selected' : '' }}>Tawuran</option>
+                                <option value="Kekerasan" {{ $laporan->kategori == 'Kekerasan' ? 'selected' : '' }}>Kekerasan</option>
+                                <option value="Penipuan" {{ $laporan->kategori == 'Penipuan' ? 'selected' : '' }}>Penipuan</option>
+                                <option value="Pelecehan" {{ $laporan->kategori == 'Pelecehan' ? 'selected' : '' }}>Pelecehan</option>
+                                <option value="Lain-lain" {{ $laporan->kategori == 'Lain-lain' ? 'selected' : '' }}>Lain-lain</option>
+                            </select>
+                        </div>
+
+                        <div>
                             <label for="status" class="block text-sm font-medium text-gray-700 mb-1">
                                 Status Laporan
                             </label>

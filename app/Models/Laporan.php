@@ -13,6 +13,7 @@ class Laporan extends Model
         'user_id',
         'judul_laporan',
         'deskripsi',
+        'kategori',
         'tgl_lapor',
         'ip_terlapor',
         'status',
@@ -22,5 +23,10 @@ class Laporan extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function polisi()
+    {
+        return $this->belongsTo(Polisi::class, 'polisi_id');
     }
 }

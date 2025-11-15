@@ -334,8 +334,13 @@
             </svg>
 
             <h1 class="text-3xl font-medium mb-4">
-                Selamat Datang di Crime-Alert
+                Selamat Datang,
+                @auth
+                    {{ Auth::user()->name }}
+                @endauth
+                di Crime-Alert 👋
             </h1>
+
 
             <p class="mb-6 text-[#706f6c] dark:text-[#A1A09A] text-lg">
                 Platform keamanan komunitas Anda. Laporkan insiden, terima peringatan *real-time*, dan tetap waspada dengan informasi di sekitar Anda.

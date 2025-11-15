@@ -16,6 +16,10 @@
                         <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                             {{ __('Dashboard Admin') }}
                         </x-nav-link>
+                    @elseif(Auth::user()->role === 'polisi')
+                        <x-nav-link :href="route('polisi.dashboard')" :active="request()->routeIs('polisi.dashboard')">
+                            {{ __('Dashboard Polisi') }}
+                        </x-nav-link>
                     @else
                         <x-nav-link :href="route('user.dashboard')" :active="request()->routeIs('user.dashboard')">
                             {{ __('Dashboard User') }}
@@ -23,6 +27,11 @@
                         <x-nav-link :href="route('laporan.create')" :active="request()->routeIs('laporan.create')">
                             {{ __('Buat Laporan') }}
                         </x-nav-link>
+                    @endif
+                    @if(Auth::user()->role === 'polisi')
+                            <x-nav-link :href="route('polisi.dashboard')" :active="request()->routeIs('polisi.dashboard')">
+                                {{ __('Dashboard Polisi') }}
+                            </x-nav-link>
                     @endif
 
                 </div>

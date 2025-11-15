@@ -1,4 +1,4 @@
-<x-app-layout>
+`<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Detail Laporan') }}
@@ -21,6 +21,11 @@
                     </div>
 
                     <div>
+                        <h3 class="text-lg font-semibold mb-2">Kategori</h3>
+                        <p class="text-gray-700 whitespace-pre-line">{{ $laporan->kategori ?? '-' }}</p>
+                    </div>
+
+                    <div>
                         <h3 class="text-lg font-semibold mb-2">Tanggal Lapor</h3>
                         <p class="text-gray-700">{{ $laporan->tgl_lapor ?? '-' }}</p>
                     </div>
@@ -40,6 +45,24 @@
                             {{ ucfirst($laporan->status ?? 'pending') }}
                         </span>
                     </div>
+
+                    <form action="{{ route('admin.laporan.assign', $laporan->id) }}" method="POST">
+                        @csrf
+                        <label for="polisi_id" class="block text-sm font-medium text-gray-700">Tugaskan ke Polisi:</label>
+                        <select name="polisi_id" id="polisi_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="">-- Pilih Polisi --</option>
+                            @foreach($polisis as $p)
+                                <option value="{{ $p->id }}" {{ $laporan->polisi_id == $p->id ? 'selected' : '' }}>
+                                    {{ $p->nama }} ({{ $p->jabatan ?? 'Tidak Diketahui' }})
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="submit" class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            Simpan Penugasan
+                        </button>
+                    </form>
+
 
                     <div class="pt-4">
                         <a href="{{ route('admin.laporan.index') }}"

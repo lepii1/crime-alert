@@ -37,6 +37,21 @@
                         </div>
 
                         <div>
+                            <label class="block font-semibold text-gray-700 mb-1">Kategori Kejahatan</label>
+                            <select name="kategori"
+                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 @error('kategori') border-red-500 @enderror">
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                <option value="Pencurian" {{ old('kategori') == 'Pencurian' ? 'selected' : '' }}>Pencurian</option>
+                                <option value="Tawuran" {{ old('kategori') == 'Tawuran' ? 'selected' : '' }}>Tawuran</option>
+                                <option value="Kekerasan" {{ old('kategori') == 'Kekerasan' ? 'selected' : '' }}>Kekerasan</option>
+                                <option value="Penipuan" {{ old('kategori') == 'Penipuan' ? 'selected' : '' }}>Penipuan</option>
+                                <option value="Pelecehan" {{ old('kategori') == 'Pelecehan' ? 'selected' : '' }}>Pelecehan</option>
+                                <option value="Lain-lain" {{ old('kategori') == 'Lain-lain' ? 'selected' : '' }}>Lain-lain</option>
+                            </select>
+                            @error('kategori') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div>
                             <label class="block font-semibold">Tanggal Lapor</label>
                             <input type="date" name="tgl_lapor" value="{{ old('tgl_lapor') }}"
                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">

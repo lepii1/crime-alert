@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Polisi;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +40,13 @@ class DatabaseSeeder extends Seeder
             'email' => 'linda@gmail.com',
             'password' => Hash::make('linda123'),
             'role' => 'admin',
+        ]);
+
+        User::create([
+            'name' => 'Ilham',
+            'email' => 'ilham@gmail.com',
+            'password' => Hash::make('ilham123'),
+            'role' => 'user',
         ]);
     }
 }

@@ -20,6 +20,7 @@ class LaporanController extends Controller
         $request->validate([
             'judul_laporan' => 'required|string',
             'deskripsi' => 'required|string',
+            'kategori' => 'required|string',
             'tgl_lapor' => 'required|date',
             'ip_terlapor' => 'nullable|string',
         ]);
@@ -28,6 +29,7 @@ class LaporanController extends Controller
             'user_id' => auth()->id(),
             'judul_laporan' => $request->judul_laporan,
             'deskripsi' => $request->deskripsi,
+            'kategori' => $request->kategori,
             'tgl_lapor' => $request->tgl_lapor,
             'ip_terlapor' => $request->ip_terlapor,
             'status' => 'pending',

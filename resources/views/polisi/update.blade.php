@@ -25,30 +25,27 @@
 
     <hr class="my-4">
 
-    <div class="flex items-center gap-3 mt-4">
+    <!-- FORM UBAH STATUS -->
+    <form action="{{ route('polisi.laporan.status', $laporan->id) }}" method="POST">
+        @csrf
 
-        @if ($bolehEdit)
-            <a href="{{ route('polisi.laporan.edit', $laporan->id) }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Edit Laporan
-            </a>
-        @else
-            <p class="text-sm text-gray-500 italic px-2 py-4">
-                @if ($laporan->polisi)
-                    Laporan ini sudah ditangani oleh {{ $laporan->polisi->nama }}.
-                @else
-                    Laporan ini belum ditangani oleh polisi mana pun.
-                @endif
-            </p>
+        <label for="status" class="font-semibold">Update Status:</label>
+        <select name="status" class="border p-2 rounded w-full mt-2">
+            <option value="pending" {{ $laporan->status == 'pending' ? 'selected' : '' }}>Pending</option>
+            <option value="proses" {{ $laporan->status == 'proses' ? 'selected' : '' }}>Proses</option>
+            <option value="selesai" {{ $laporan->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+        </select>
 
-        @endif
-
+        <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+            Simpan Perubahan
+        </button>
         <a href="{{ route('polisi.dashboard') }}"
-           class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-            Kembali
+           class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg">
+            Kembali ke Dashboard
         </a>
+    </form>
 
-    </div>
+
 </div>
 
 </body>

@@ -21,9 +21,15 @@ class PolisiDashboardController extends Controller
 
     public function show($id)
     {
+        $polisi = Auth::guard('polisi')->user();
         $laporan = Laporan::findOrFail($id);
-        return view('polisi.detail', compact('laporan'));
+
+        // Tentukan apakah polisi ini boleh edit laporan
+        $bolehEdit = ($laporan->polisi_id == $polisi->id);
+
+        return view('polisi.detail', compact('laporan', 'polisi', 'bolehEdit'));
     }
+
 
     public function updateStatus(Request $request, $id)
     {
@@ -37,7 +43,8 @@ class PolisiDashboardController extends Controller
 
         // Nanti bisa ditambah notifikasi admin & user di sini
 
-        return redirect()->route('polisi.dashboard')->with('success', 'Status laporan berhasil diperbarui.');
+        return redirect()->route('polisi.dashboard')
+            ->with('success', 'Status laporan berhasil diperbarui.');
     }
 
     public function profil()
@@ -48,7 +55,7 @@ class PolisiDashboardController extends Controller
 
     public function edit()
     {
-        $polisi = Auth::guard('polisi')->user(); // <-- Variabel diubah menjadi $user
+        $polisi = Auth::guard('polisi')->user(); //
         return view('polisi.edit', compact('polisi'));
     }
 
@@ -76,4 +83,37 @@ class PolisiDashboardController extends Controller
         return redirect()->route('polisi.profil')
             ->with('success', 'Profil berhasil diperbarui!');
     }
+
+    public function tangani($id)
+    {
+        $polisi = Auth::guard('polisi')->user();
+        $laporan = Laporan::findOrFail($id);
+
+        if ($laporan->polisi_id && $laporan->polisi_id != $polisi->id) {
+            return redirect()->back()->with('error', 'Laporan sudah ditangani polisi lain.');
+        }
+
+        // Assign laporan
+        $laporan->polisi_id = $polisi->id;
+        $laporan->status = 'proses';
+        $laporan->save();
+
+        return redirect()->route('polisi.laporan.show', $laporan->id)
+            ->with('success', 'Anda telah mengambil laporan ini untuk ditangani.');
+    }
+
+    public function editLaporan($id)
+    {
+        $polisi = Auth::guard('polisi')->user();
+        $laporan = Laporan::findOrFail($id);
+
+        if ($laporan->polisi_id != $polisi->id) {
+            return redirect()->route('polisi.laporan.show', $id)
+                ->with('error', 'Anda tidak memiliki izin untuk mengedit laporan ini.');
+        }
+
+        return view('polisi.update', compact('laporan'));
+    }
+
+
 }

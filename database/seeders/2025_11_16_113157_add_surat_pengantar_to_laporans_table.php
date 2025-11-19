@@ -9,26 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('laporans', function (Blueprint $table) {
-            $table->unsignedBigInteger('polisi_id')->nullable()->after('user_id');
-
-            $table->foreign('polisi_id')
-                ->references('id')
-                ->on('polisis')
-                ->onDelete('set null');
+            $table->string('surat_pengantar')->nullable()->after('file');
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::table('laporans', function (Blueprint $table) {
-            $table->dropForeign(['polisi_id']);
-            $table->dropColumn('polisi_id');
+
         });
     }
 };

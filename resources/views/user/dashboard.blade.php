@@ -15,6 +15,13 @@
                             {{ session('success') }}
                         </div>
                     @endif
+
+                    @foreach(auth()->user()->notifications as $notif)
+                        <div class="p-3 bg-green-100 rounded my-2">
+                            {{ $notif->data['message'] }}
+                        </div>
+                    @endforeach
+
                     {{ __("You're logged in!") }}
                 </div>
             </div>

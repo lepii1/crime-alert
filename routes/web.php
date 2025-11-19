@@ -159,6 +159,16 @@ Route::middleware('auth:polisi')->prefix('polisi')->name('polisi.')->group(funct
     Route::post('/laporan/{id}/status',
         [PolisiDashboardController::class, 'updateStatus'])
         ->name('laporan.status');
+
+    Route::post('/laporan/{id}/tangani', [PolisiDashboardController::class, 'tangani'])
+        ->name('laporan.tangani');
+
+    Route::get('/laporan/{id}/edit', [PolisiDashboardController::class, 'editLaporan'])
+        ->name('laporan.edit');
+
+    Route::put('/laporan/{id}', [PolisiDashboardController::class, 'updateStatus'])
+        ->name('laporan.update');
+
 });
 
 

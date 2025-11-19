@@ -22,6 +22,18 @@
     </script>
 @endif
 
+@if (session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: '{{ session('error') }}',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    </script>
+@endif
+
 
 <!-- NAVBAR -->
 @include('polisi.navbar')
@@ -35,29 +47,73 @@
         </h2>
 
         <p class="text-gray-600 mb-4">
-            Berikut adalah daftar laporan yang ditugaskan kepada Anda:
+            Berikut adalah semua laporan masuk yang dapat Anda tangani:
         </p>
 
         <!-- LIST LAPORAN -->
         @if ($laporans->isEmpty())
             <div class="bg-blue-100 text-blue-700 p-3 rounded">
-                Tidak ada laporan yang ditugaskan saat ini.
+                Tidak ada laporan tersedia.
             </div>
         @else
-            <div class="space-y-3">
+            <div class="space-y-4">
                 @foreach ($laporans as $laporan)
-                    <a href="{{ route('polisi.laporan.show', $laporan->id) }}"
-                       class="block p-4 border rounded-lg hover:bg-gray-50 transition">
+                    <div class="p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition">
 
-                        <p class="font-semibold text-gray-800">
-                            {{ $laporan->judul }}
-                        </p>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <!-- JUDUL -->
+                                <p class="font-semibold text-gray-800 text-lg">
+                                    {{ $laporan->judul_laporan }}
+                                </p>
 
-                        <p class="text-sm text-gray-500">
-                            {{ $laporan->created_at->format('d M Y H:i') }}
-                        </p>
+                                <!-- TANGGAL -->
+                                <p class="text-sm text-gray-500">
+                                    {{ $laporan->created_at->format('d M Y H:i') }}
+                                </p>
 
-                    </a>
+                                <!-- STATUS POLISI -->
+                                <div class="mt-2">
+                                    @if ($laporan->polisi_id === null)
+                                        <span class="px-3 py-1 text-sm rounded bg-yellow-200 text-yellow-800">
+                                            Belum Ditangani
+                                        </span>
+                                    @elseif ($laporan->polisi_id == $polisi->id)
+                                        <span class="px-3 py-1 text-sm rounded bg-blue-200 text-blue-800">
+                                            Ditangani Anda
+                                        </span>
+                                    @else
+                                        <span class="px-3 py-1 text-sm rounded bg-red-200 text-red-800">
+                                            Telah di tangani oleh {{ $laporan->polisi->jabatan }} {{ $laporan->polisi->nama }}
+                                        </span>
+                                    @endif
+                                </div>
+
+                            </div>
+
+                            <!-- BUTTONS -->
+                            <div class="space-x-2">
+
+                                <!-- DETAIL -->
+                                <a href="{{ route('polisi.laporan.show', $laporan->id) }}"
+                                   class="px-3 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700">
+                                    Detail
+                                </a>
+
+                                <!-- TOMBOL TANGANI -->
+                                @if ($laporan->polisi_id === null)
+                                    <form action="{{ route('polisi.laporan.tangani', $laporan->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button class="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
+                                            Tangani
+                                        </button>
+                                    </form>
+                                @endif
+
+                            </div>
+
+                        </div>
+                    </div>
                 @endforeach
             </div>
         @endif

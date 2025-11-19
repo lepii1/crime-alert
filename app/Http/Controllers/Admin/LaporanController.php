@@ -161,6 +161,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
 use App\Models\Polisi;
+use App\Notifications\AdminUpdateLaporan;
 
 class LaporanController extends Controller
 {
@@ -236,6 +237,16 @@ class LaporanController extends Controller
             'kategori' => $request->kategori,
             'status' => $request->status,
         ]);
+
+        $laporan = Laporan::findOrFail($id);
+        $laporan->status = $request->status;
+        $laporan->save();
+
+        // Kirim notifikasi ke user pembuat laporan
+        $user = $laporan->user;
+        if ($user) {
+            $user->notify(new AdminUpdateLaporan($laporan));
+        }
 
         return redirect()->route('admin.laporan.index')
             ->with('success', 'Laporan berhasil diperbarui.');

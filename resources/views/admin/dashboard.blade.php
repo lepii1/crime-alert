@@ -9,6 +9,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+
+                    @foreach(auth()->user()->notifications as $notif)
+                        <div class="p-3 bg-blue-100 rounded my-2">
+                            {{ $notif->data['message'] }}
+                            (Status: {{ $notif->data['status'] }})
+                        </div>
+                    @endforeach
+
                     <p class="mb-4">{{ __("Welcome, Admin! You have full access.") }}</p>
 
                     <div class="space-y-2">

@@ -37,6 +37,13 @@
             padding-left: 1rem;
             padding-right: 1rem;
         }
+        /* Style untuk Kartu Konten Utama */
+        .card-content {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); /* Shadow lebih menonjol */
+            padding: 30px; /* Padding ditingkatkan */
+        }
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -69,9 +76,10 @@
 {{-- KONTEN UTAMA --}}
 <main class="py-12">
     <div class="main-content-wrapper">
-        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-            <div class="p-6 text-gray-900">
-                <h3 class="text-2xl font-bold mb-6 text-gray-800">Form Laporan Baru</h3>
+        {{-- KARTU UTAMA DENGAN SHADOW & ROUNDED CORNERS --}}
+        <div class="card-content">
+            <div class="p-0 text-gray-900">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">Form Laporan Baru</h3>
 
                 {{-- Pesan sukses --}}
                 @if (session('success'))
@@ -80,7 +88,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('laporan.store') }}" method="POST" class="space-y-6">
+                <form action="{{ route('laporan.store') }}" method="POST" class="space-y-6 pt-4">
                     @csrf
 
                     <div>
@@ -91,7 +99,7 @@
                     </div>
 
                     <div>
-                        <label class="block font-medium text-gray-700 mb-1">Deskripsi</label>
+                        <label class="block font-medium text-gray-700 mb-1">Deskripsi Kejadian</label>
                         <textarea name="deskripsi"
                                   class="form-input-style"
                                   rows="4">{{ old('deskripsi') }}</textarea>
@@ -114,7 +122,7 @@
                     </div>
 
                     <div>
-                        <label class="block font-medium text-gray-700 mb-1">Tanggal Lapor</label>
+                        <label class="block font-medium text-gray-700 mb-1">Tanggal Kejadian</label>
                         <input type="date" name="tgl_lapor" value="{{ old('tgl_lapor') }}"
                                class="form-input-style">
                         @error('tgl_lapor') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
@@ -126,7 +134,7 @@
                                class="form-input-style bg-gray-100 cursor-not-allowed">
                     </div>
 
-                    <div class="flex items-center pt-4">
+                    <div class="flex items-center pt-4 border-t border-gray-100">
                         <input type="checkbox" id="confirm" name="confirm" required
                                class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
                         <label for="confirm" class="ml-2 text-gray-700 text-sm">
@@ -135,11 +143,13 @@
                         @error('confirm') <p class="text-red-600 text-sm mt-1">Anda harus mengkonfirmasi kebenaran laporan.</p> @enderror
                     </div>
 
-                    <button type="submit" id="submitBtn"
-                            class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-lg disabled:opacity-50 transition"
-                            disabled>
-                        Kirim Laporan
-                    </button>
+                    <div class="flex justify-end">
+                        <button type="submit" id="submitBtn"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-lg disabled:opacity-50 transition"
+                                disabled>
+                            Kirim Laporan
+                        </button>
+                    </div>
                 </form>
 
                 <script>

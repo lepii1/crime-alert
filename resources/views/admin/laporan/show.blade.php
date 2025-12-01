@@ -59,6 +59,7 @@
         .sidebar-header h2 {
             font-size: 1.2rem;
             font-weight: 600;
+            padding-top: 4px;
             padding-left: 10px;
         }
         .sidebar-nav ul {

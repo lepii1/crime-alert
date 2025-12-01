@@ -85,16 +85,15 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->prefix('user')->group(function () {
-    Route::get('/dashboard', function () {
-        if (auth()->user()->role !== 'user') {
-            auth()->logout();
-            return redirect('/login')->with('error', 'Akses ditolak! Anda bukan user.');
-        }
-        return view('user.dashboard');
-    })->name('user.dashboard');
+    // === FIX PENTING DI SINI ===
+    Route::get('/dashboard', [LaporanController::class, 'dashboard'])->name('user.dashboard');
+    // ^^^ Mengganti Closure dengan pemanggilan Controller LaporanController@dashboard ^^^
+    // ===========================
 
     Route::get('/laporan/create', [LaporanController::class, 'create'])->name('laporan.create');
     Route::post('/laporan', [LaporanController::class, 'store'])->name('laporan.store');
+    // Tambahkan rute show yang diperlukan oleh dashboard user
+    Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
 });
 
 /*
@@ -103,17 +102,17 @@ Route::middleware(['auth'])->prefix('user')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->prefix('admin')->group(function () {
-    // === BAGIAN YANG HARUS DIPERBAIKI ===
-    // Ganti Closure function () { ... } dengan Controller call
+    // FIX: Memastikan rute dashboard memanggil Controller admin
     Route::get('/dashboard', [AdminLaporanController::class, 'dashboard'])
         ->name('admin.dashboard');
-    // ====================================
 
     Route::get('/laporan', [AdminLaporanController::class, 'adminIndex'])->name('admin.laporan.index');
     Route::get('/laporan/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.show');
     Route::get('/laporan/{id}/edit', [AdminLaporanController::class, 'edit'])->name('admin.laporan.edit');
     Route::put('/laporan/{id}', [AdminLaporanController::class, 'update'])->name('admin.laporan.update');
     Route::delete('/laporan/{id}', [AdminLaporanController::class, 'destroy'])->name('admin.laporan.destroy');
+
+    // FIX PENTING: Mengganti LaporanController::assignStore menjadi AdminLaporanController::assignStore
     Route::get('/laporan/{id}/assign', [AdminLaporanController::class, 'assignForm'])->name('admin.laporan.assign');
     Route::post('/laporan/{id}/assign', [AdminLaporanController::class, 'assignStore'])->name('admin.laporan.assign.store');
 });

@@ -17,6 +17,7 @@ class Laporan extends Model
         'tgl_lapor',
         'ip_terlapor',
         'status',
+        'polisi_id'
     ];
 
     // Relasi ke user

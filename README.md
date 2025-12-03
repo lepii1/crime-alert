@@ -1,59 +1,65 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚨 Crime Alert: Platform Pelaporan & Analisis Kejahatan Komunitas
+Crime Alert adalah solusi web modern yang dibangun menggunakan Laravel 12, dirancang untuk menghubungkan masyarakat dan 
+penegak hukum. Platform ini memungkinkan pengguna (warga) untuk melaporkan insiden kejahatan secara real-time dan rahasia, 
+sementara administrator (kepolisian) mendapatkan alat analitik dan manajemen penugasan yang canggih.
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="" width="400" alt="Crime Alert">
 </p>
 
-## About Laravel
+## Fitur Utama
+Proyek ini terbagi menjadi dua pengalaman pengguna (User dan Admin) dengan fitur inti sebagai berikut:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 👤 Untuk Pengguna (User)
+- **Akses Publik (Welcome Page):** Landing page yang informatif, menarik, dan kondisional (menampilkan link Dashboard jika sudah login, atau Register jika belum).
+- **Pelaporan Cepat:** Formulir laporan yang sederhana, fokus, dan dioptimalkan secara visual dengan input styling Tailwind yang rapi.
+- **Pelacakan Status:** Dashboard pribadi yang menampilkan ringkasan laporan (Total, Pending, Proses, Selesai) dan riwayat laporan pribadi.
+- **Detail Laporan:** Pengguna dapat melihat detail laporan mereka, termasuk status penanganan dan informasi petugas yang ditugaskan (jika ada).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🛡️ Untuk Administrator (Admin / Kepolisian)
+- **Dashboard Operasional:** Tampilan ringkasan yang menampilkan Line Chart tren kejahatan 12 bulan terakhir secara dinamis dan daftar Laporan PENTING (Pending) yang siap ditugaskan.
+- **Manajemen Laporan:** Halaman index laporan dengan filter server-side yang komprehensif berdasarkan Kategori, Status, Bulan, dan Tahun Kejadian (tgl_lapor).
+- **Sistem Penugasan Dinamis:** Admin dapat menugaskan laporan yang masuk kepada petugas (Model Polisi), yang secara otomatis mengubah status laporan menjadi Proses.
+- **Halaman Analisis Visual(Reports):** Halaman khusus yang menampilkan tiga jenis Chart menggunakan Chart.js: Tren Bulanan, Distribusi Kategori, dan Rasio Status Penanganan.
+- **Responsivitas Penuh:** Semua view Admin (Dashboard, Laporan Index, Profile) dioptimalkan untuk desktop dan mobile (dengan sidebar toggle dan modal kustom).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi dan Filosofi Desain
+- **Backend:** PHP (Laravel 12.x) & Eloquent ORM.
+- **Frontend:** Tailwind CSS & Alpine.js (Digunakan untuk sidebar toggle dan modal custom).
+- **Visualisasi:** Chart.js (Untuk data analisis yang interaktif).
+- **Desain Tema UI:** Palet warna konsisten (#2c3e50 dan aksen merah #e74c3c), memastikan tampilan yang profesional dan mobile-first.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Instalasi dan Kontribusi
+Untuk menjalankan proyek ini, Anda memerlukan PHP, Composer, Node.js, dan NPM.
+1. **Install Dependensi**:
+   ```bash
+   composer install
+   npm install
+   ```
+2. **Konfigurasi Database dan Key**:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Edit kredensial database pada file `.env` lalu jalankan:
+   ```bash
+   php artisan migrate --seed
+   ```
+3. **Kompilasi frontend (Wajib)**:
+   ```bash
+   npm run dev
+   ```
+   Biarkan terminal ini berjalan saat Anda mengembangkan, atau gunakan 'npm run build' untuk produksi.
+4. **Akses aplikasi**:
+   Buka: `http://127.0.0.1:8000/`
 
 ## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Terima kasih atas minat Anda pada proyek Crime Alert! Kami menerima kontribusi untuk perbaikan bug, peningkatan fitur, 
+atau saran desain. Silakan lihat panduan kontribusi Laravel jika Anda ingin berkontribusi pada kerangka kerja utamanya.
 
 ## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Jika Anda menemukan kerentanan keamanan dalam aplikasi ini, harap segera beritahu tim developer.
 
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The Crime Alert platform is built on the Laravel framework, yang merupakan perangkat lunak open-source yang dilisensikan 
+di bawah **MIT License**.

@@ -4,7 +4,7 @@ penegak hukum. Platform ini memungkinkan pengguna (warga) untuk melaporkan insid
 sementara administrator (kepolisian) mendapatkan alat analitik dan manajemen penugasan yang canggih.
 
 <p align="center">
-<img src="" width="400" alt="Crime Alert">
+<img src="tambahan/tumbhnail.png" width="400" alt="Crime Alert">
 </p>
 
 ## Fitur Utama

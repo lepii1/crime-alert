@@ -85,14 +85,11 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->prefix('user')->group(function () {
-    // === FIX PENTING DI SINI ===
+    // FIX: Mengganti Closure dengan pemanggilan Controller LaporanController@dashboard
     Route::get('/dashboard', [LaporanController::class, 'dashboard'])->name('user.dashboard');
-    // ^^^ Mengganti Closure dengan pemanggilan Controller LaporanController@dashboard ^^^
-    // ===========================
 
     Route::get('/laporan/create', [LaporanController::class, 'create'])->name('laporan.create');
     Route::post('/laporan', [LaporanController::class, 'store'])->name('laporan.store');
-    // Tambahkan rute show yang diperlukan oleh dashboard user
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');
 });
 
@@ -105,6 +102,9 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // FIX: Memastikan rute dashboard memanggil Controller admin
     Route::get('/dashboard', [AdminLaporanController::class, 'dashboard'])
         ->name('admin.dashboard');
+
+    // RUTE BARU UNTUK CHART/REPORTS
+    Route::get('/laporan/reports', [AdminLaporanController::class, 'reports'])->name('admin.laporan.reports');
 
     Route::get('/laporan', [AdminLaporanController::class, 'adminIndex'])->name('admin.laporan.index');
     Route::get('/laporan/{id}', [AdminLaporanController::class, 'show'])->name('admin.laporan.show');

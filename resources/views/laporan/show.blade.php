@@ -57,7 +57,7 @@
 
 {{-- HEADER/NAVIGASI ATAS --}}
 <header class="header shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <div class="main-content-wrapper py-4 flex justify-between items-center">
         <div class="flex items-center">
             <i class="fas fa-exclamation-circle mr-3 header-logo text-2xl"></i>
             <h1 class="text-xl font-semibold">CRIME ALERT - LAPORAN #{{ $laporan->id }}</h1>

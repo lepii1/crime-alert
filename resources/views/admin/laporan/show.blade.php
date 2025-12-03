@@ -166,7 +166,7 @@
                     <ul>
                         <li><a href="{{ route('admin.dashboard') }}" @click="open = false"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                         <li><a href="{{ route('admin.laporan.index') }}" class="active" @click="open = false"><i class="fas fa-bell"></i> Laporan Masuk</a></li>
-                        <li><a href="#" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                        <li><a href="{{ route('admin.laporan.reports') }}" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
                         <li><a href="{{ route('profile.edit') }}" @click="open = false"><i class="fas fa-cog"></i> Settings</a></li>
                     </ul>
                 </nav>

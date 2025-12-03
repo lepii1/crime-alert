@@ -7,12 +7,18 @@
 
     <title>Admin Dashboard - Crime Alert</title>
 
+    <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Alpine.js untuk interaksi sidebar di mobile -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+        /* CSS Tema Dashboard */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f0f2f5;
@@ -23,6 +29,7 @@
             min-height: 100vh;
         }
 
+        /* 1. SIDEBAR RESPONSIVE */
         .sidebar {
             width: 250px;
             background-color: #2c3e50;
@@ -38,11 +45,13 @@
             /* Default: Sembunyikan di luar viewport untuk mobile */
             transform: translateX(-100%);
         }
+        /* Desktop/Layar Lebar: Selalu tampil */
         @media (min-width: 1024px) {
             .sidebar {
                 transform: translateX(0);
             }
         }
+        /* Class Alpine untuk membuka sidebar di mobile */
         .sidebar-open {
             transform: translateX(0) !important;
         }
@@ -57,7 +66,6 @@
         .sidebar-header h2 {
             font-size: 1.2rem;
             font-weight: 600;
-            padding-top: 4px;
             padding-left: 10px;
         }
         .sidebar-nav ul {
@@ -80,25 +88,17 @@
             margin-right: 10px;
             font-size: 18px;
         }
-        .sidebar-nav form {
-            /* Pastikan form mengisi lebar penuh */
-            width: 100%;
-        }
         .sidebar-nav form button {
             display: flex;
             align-items: center;
             padding: 12px 20px;
             color: #ecf0f1;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
             background: none;
             border: none;
             cursor: pointer;
             width: 100%;
             text-align: left;
         }
-
-        /* PUSH LOGOUT KE BAWAH */
         .sidebar-content {
             display: flex;
             flex-direction: column;
@@ -150,24 +150,36 @@
             color: #555;
             margin-bottom: 15px;
         }
+        /* Kontainer Chart agar Chart.js bisa mengatur tinggi */
         .chart-container {
-            height: 200px; /* Sesuaikan sesuai kebutuhan */
-            width: 100%;
+            position: relative;
+            height: 200px; /* Tinggi yang pas untuk dashboard card */
+            max-height: 200px;
         }
         .alert-item {
             display: flex;
             align-items: center;
-            margin-bottom: 15px;
-            color: #333;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .alert-item i {
-            color: #e74c3c;
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+        .alert-icon {
+            color: #e74c3c; /* Warna merah untuk Alert */
             margin-right: 10px;
             font-size: 1.2rem;
         }
-        .alert-item span {
+        .alert-title {
             font-weight: 500;
             margin-right: auto;
+            color: #333;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+        .alert-time {
+            color: #777;
+            font-size: 0.8rem;
         }
         .recent-reports ul {
             list-style: none;
@@ -201,13 +213,13 @@
 
 {{-- TOMBOL HAMBURGER --}}
 <div @click="open = true"
-     class="lg:hidden fixed top-3 right-1 m-4 p-2 bg-indigo-600 text-white rounded-lg shadow-lg cursor-pointer z-[60]">
+     class="lg:hidden fixed top-0 right-0 m-4 p-2 bg-indigo-600 text-white rounded-lg shadow-lg cursor-pointer z-[60]">
     <i class="fas fa-bars"></i>
 </div>
 
 <div class="flex-container">
 
-    {{-- SIDEBAR - RESPONSIVE --}}
+    {{-- SIDEBAR --}}
     <div class="sidebar" :class="{'sidebar-open': open}">
         <div class="sidebar-content">
             <div>
@@ -225,13 +237,13 @@
                     <ul>
                         <li><a href="{{ route('admin.dashboard') }}" class="active" @click="open = false"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                         <li><a href="{{ route('admin.laporan.index') }}" @click="open = false"><i class="fas fa-bell"></i> Laporan Masuk</a></li>
-                        <li><a href="#" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                        <li><a href="{{ route('admin.laporan.reports') }}" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
                         <li><a href="{{ route('profile.edit') }}" @click="open = false"><i class="fas fa-cog"></i> Settings</a></li>
                     </ul>
                 </nav>
             </div>
 
-            {{-- LOGOUT (DORONG KE BAWAH) --}}
+            {{-- LOGOUT --}}
             <div class="p-4 pt-0">
                 <form method="POST" action="{{ route('logout') }}" @click="open = false">
                     @csrf
@@ -243,7 +255,7 @@
         </div>
     </div>
 
-    {{-- OVERLAY (HANYA DI MOBILE) --}}
+    {{-- OVERLAY --}}
     <div x-show="open"
          @click="open = false"
          class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
@@ -255,34 +267,30 @@
         <h1 class="dashboard-header">Dashboard</h1>
 
         <div class="card-grid">
-            {{-- KARTU 1: GRAFIK --}}
+            {{-- KARTU 1: GRAFIK TREN (DINAMIS) --}}
             <div class="card">
-                <h3 class="card-title">Number of Crimes</h3>
+                <h3 class="card-title">Tren Laporan (12 Bulan)</h3>
                 <div class="chart-container">
-                    {{-- Placeholder Grafik --}}
-                    <img src="https://quickchart.io/chart?c={type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul'],datasets:[{label:'Crimes',data:[20,30,25,40,35,45,30],fill:false,borderColor:'rgb(231, 76, 60)',tension:0.1}]}}" alt="Crime Chart" style="width:100%; height:100%; object-fit: contain;">
+                    <canvas id="monthlyTrendChartDashboard"></canvas>
                 </div>
             </div>
 
-            {{-- KARTU 2: CRIME ALERTS --}}
+            {{-- KARTU 2: CRIME ALERTS (LAPORAN PENDING) --}}
             <div class="card">
-                <h3 class="card-title">Crime Alerts</h3>
-                <div>
-                    {{-- Tampilkan 3 notifikasi terbaru --}}
-                    @if (auth()->user()->notifications->count())
-                        @foreach(auth()->user()->notifications->take(3) as $notif)
-                            <div class="alert-item">
-                                <i class="fas fa-bell"></i>
-                                <span>{{ $notif->data['message'] ?? 'Notifikasi Baru' }}</span>
-                                <span style="color: #777; font-size: 0.9rem;">{{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}</span>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="alert-item text-gray-500 italic">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Tidak ada notifikasi baru.</span>
+                <h3 class="card-title">Laporan PENTING (Pending)</h3>
+                <div class="space-y-1">
+                    @forelse($pendingReports as $report)
+                        <a href="{{ route('admin.laporan.show', $report->id) }}" class="alert-item hover:bg-gray-50 transition">
+                            <i class="fas fa-exclamation-triangle alert-icon"></i>
+                            <span class="alert-title">{{ $report->judul_laporan }} ({{ $report->kategori }})</span>
+                            <span class="alert-time">{{ \Carbon\Carbon::parse($report->tgl_lapor)->diffForHumans() }}</span>
+                        </a>
+                    @empty
+                        <div class="alert-item text-gray-500 italic border-b-0">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span>Tidak ada laporan yang perlu ditugaskan.</span>
                         </div>
-                    @endif
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -301,12 +309,63 @@
                 @empty
                     <li class="text-gray-500 italic p-3">
                         <i class="fas fa-database mr-2"></i>
-                        <span>Tidak ada laporan terbaru di database Anda.</span>
+                        Tidak ada laporan terbaru di database Anda.
                     </li>
                 @endforelse
             </ul>
         </div>
     </div>
 </div>
+
+<script>
+    // Inisialisasi Chart.js untuk Dashboard Card
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartData = @json($monthlyChartData);
+        const colorAccent = 'rgb(231, 76, 60)'; // #e74c3c
+
+        new Chart(document.getElementById('monthlyTrendChartDashboard'), {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Laporan',
+                    data: chartData.data,
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    borderColor: colorAccent,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3 // Membuat titik lebih kecil
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Sembunyikan legenda
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            maxTicksLimit: 4, // Batasi jumlah label di sumbu Y
+                            stepSize: 10
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 </body>
 </html>

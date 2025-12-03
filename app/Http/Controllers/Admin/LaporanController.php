@@ -5,79 +5,141 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
-use App\Models\Polisi; // PENTING: Memastikan Model Polisi diimpor
+use App\Models\Polisi;
 use App\Notifications\AdminUpdateLaporan;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
     /**
      * Menampilkan Dashboard Admin.
+     * Mengambil data untuk chart tren 12 bulan dan laporan terbaru.
      */
     public function dashboard(Request $request)
     {
-        // Ambil 3 laporan terbaru
+        // 1. Ambil 3 laporan terbaru untuk Recent Reports
         $laporan = Laporan::latest()->take(3)->get();
+
+        // 2. Data Trend Bulanan (12 bulan terakhir)
+        $monthlyData = Laporan::select(
+            DB::raw('COUNT(id) as count'),
+            DB::raw("DATE_FORMAT(tgl_lapor, '%Y-%m') as month_year"),
+            DB::raw("DATE_FORMAT(tgl_lapor, '%b') as month_name") // Hanya bulan singkat untuk dashboard
+        )
+            ->where('tgl_lapor', '>=', Carbon::now()->subMonths(11)->startOfMonth())
+            ->groupBy('month_year', 'month_name')
+            ->orderBy('month_year', 'asc')
+            ->get();
+
+        $monthlyChartData = [
+            'labels' => $monthlyData->pluck('month_name'),
+            'data' => $monthlyData->pluck('count'),
+        ];
+
+        // 3. AMBIL 3 LAPORAN TERBARU DENGAN STATUS PENDING UNTUK KARTU ALERTS
+        $pendingReports = Laporan::where('status', 'pending')
+            ->latest('tgl_lapor')
+            ->take(4)
+            ->get();
 
         return view('admin.dashboard', [
             'laporan' => $laporan,
+            'monthlyChartData' => $monthlyChartData,
+            'pendingReports' => $pendingReports, // <-- DATA BARU DIKIRIM
         ]);
     }
 
-    public function adminindex(Request $request)
+    public function reports()
     {
-        // 1. Ambil daftar Kategori Unik
+        // ... (Metode reports tetap) ...
+        $monthlyData = Laporan::select(
+            DB::raw('COUNT(id) as count'),
+            DB::raw("DATE_FORMAT(tgl_lapor, '%Y-%m') as month_year"),
+            DB::raw("DATE_FORMAT(tgl_lapor, '%b %Y') as month_name")
+        )
+            ->where('tgl_lapor', '>=', Carbon::now()->subMonths(11)->startOfMonth())
+            ->groupBy('month_year', 'month_name')
+            ->orderBy('month_year', 'asc')
+            ->get();
+
+        $monthlyChartData = [
+            'labels' => $monthlyData->pluck('month_name'),
+            'data' => $monthlyData->pluck('count'),
+        ];
+
+        $categoryData = Laporan::select('kategori', DB::raw('COUNT(id) as count'))
+            ->groupBy('kategori')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        $categoryChartData = [
+            'labels' => $categoryData->pluck('kategori'),
+            'data' => $categoryData->pluck('count'),
+        ];
+
+        $statusData = Laporan::select('status', DB::raw('COUNT(id) as count'))
+            ->groupBy('status')
+            ->get();
+
+        $statusChartData = [
+            'labels' => $statusData->pluck('status')->map(fn($s) => ucfirst($s)),
+            'data' => $statusData->pluck('count'),
+        ];
+
+        return view('admin.laporan.reports', compact('monthlyChartData', 'categoryChartData', 'statusChartData'));
+    }
+
+    public function adminIndex(Request $request)
+    {
+        // ... (metode adminIndex tetap) ...
         $kategoriList = Laporan::select('kategori')->distinct()->pluck('kategori');
 
-        // 2. Ambil daftar Tahun Unik dari kolom TGL_LAPOR (Diurutkan dari terbaru)
+        $laporanQuery = Laporan::with('user')->latest();
+
+        // Filter Kategori
+        if ($request->filled('kategori') && $request->kategori !== 'semua') {
+            $laporanQuery->where('kategori', $request->kategori);
+        }
+
+        // Filter Status
+        if ($request->filled('status')) {
+            $laporanQuery->where('status', $request->status);
+        }
+
+        // Filter Tahun dan Bulan (berbasis tgl_lapor)
+        $selectedYear = $request->input('year');
+        $selectedMonth = $request->input('month');
+
+        if ($selectedYear && $selectedYear !== 'semua') {
+            $laporanQuery->whereYear('tgl_lapor', $selectedYear);
+        }
+
+        if ($selectedMonth && $selectedMonth !== 'semua') {
+            $laporanQuery->whereMonth('tgl_lapor', $selectedMonth);
+        }
+
+        $laporan = $laporanQuery->get();
+
         $years = Laporan::select(DB::raw('YEAR(tgl_lapor) as year'))
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        // 3. Set Nilai Default dan Nilai yang Dipilih
-        $selectedKategori = $request->kategori ?? 'semua';
-        $selectedStatus = $request->status ?? 'semua';
-        $selectedYear = $request->input('year', 'semua');
-        $selectedMonth = $request->input('month', 'semua');
+        $months = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
 
-        // 4. Query Dasar Laporan
-        $laporanQuery = Laporan::with('user')->latest();
-
-        // 5. Filter Kategori
-        if ($selectedKategori !== 'semua') {
-            $laporanQuery->where('kategori', $selectedKategori);
-        }
-
-        // 6. Filter Status
-        if ($selectedStatus !== 'semua') {
-            $laporanQuery->where('status', $selectedStatus);
-        }
-
-        // 7. Filter Waktu (Tahun dan Bulan)
-
-        // A. Filter TAHUN (Jika dipilih)
-        if ($selectedYear !== 'semua') {
-            $laporanQuery->whereYear('tgl_lapor', $selectedYear);
-        }
-
-        // B. Filter BULAN (Jika dipilih, baik filter tahun aktif maupun tidak)
-        if ($selectedMonth !== 'semua') {
-            $laporanQuery->whereMonth('tgl_lapor', $selectedMonth);
-        }
-
-        // 8. Eksekusi Query
-        $laporan = $laporanQuery->get();
-
-        // Kirim semua data yang diperlukan ke view
         return view('admin.laporan.index', [
             'laporan' => $laporan,
             'kategoriList' => $kategoriList,
-            'selectedKategori' => $selectedKategori,
-            'selectedStatus' => $selectedStatus,
-            'years' => $years,             // Daftar tahun unik
-            'selectedYear' => $selectedYear,
-            'selectedMonth' => $selectedMonth,
+            'selectedKategori' => $request->kategori ?? 'semua',
+            'selectedStatus' => $request->status,
+            'years' => $years,
+            'selectedYear' => $selectedYear ?? 'semua',
+            'selectedMonth' => $selectedMonth ?? 'semua',
+            'months' => $months,
         ]);
     }
 
@@ -87,9 +149,8 @@ class LaporanController extends Controller
     public function show($id)
     {
         $laporan = Laporan::with('user', 'polisi')->findOrFail($id);
-        $polisis = Polisi::all(); // <--- VARIABEL INI YANG HILANG!
+        $polisis = Polisi::all();
 
-        // Mengirimkan $laporan dan $polisis
         return view('admin.laporan.show', compact('laporan', 'polisis'));
     }
 
@@ -120,19 +181,8 @@ class LaporanController extends Controller
             'judul_laporan' => $request->judul_laporan,
             'deskripsi' => $request->deskripsi,
             'kategori' => $request->kategori,
-            'status' => strtolower($request->status), // Simpan selalu dalam huruf kecil
+            'status' => $request->status,
         ]);
-
-        $laporan = Laporan::findOrFail($id);
-        $laporan->status = strtolower($request->status);
-        $laporan->save();
-
-        // Kirim notifikasi ke user pembuat laporan
-        $user = $laporan->user;
-        if ($user) {
-            // Asumsi: AdminUpdateLaporan adalah class Notifikasi yang valid
-            // $user->notify(new AdminUpdateLaporan($laporan));
-        }
 
         return redirect()->route('admin.laporan.index')
             ->with('success', 'Laporan berhasil diperbarui.');
@@ -143,11 +193,9 @@ class LaporanController extends Controller
      */
     public function destroy($id)
     {
-        $laporan = Laporan::findOrFail($id);
-        $laporan->delete();
-
+        Laporan::destroy($id);
         return redirect()->route('admin.laporan.index')
-            ->with('success', 'Laporan berhasil dihapus.');
+            ->with('success', 'Laporan berhasil dihapus!');
     }
 
     public function assignForm($id)
@@ -164,8 +212,12 @@ class LaporanController extends Controller
         ]);
 
         $laporan = Laporan::findOrFail($id);
-        $laporan->update(['polisi_id' => $request->polisi_id, 'status' => 'proses']);
+        $laporan->update([
+            'polisi_id' => $request->polisi_id,
+            'status' => 'proses'
+        ]);
 
-        return redirect()->route('admin.laporan.index')->with('success', 'Laporan berhasil diberikan kepada polisi.');
+        return redirect()->route('admin.laporan.show', $laporan->id)
+            ->with('success', 'Laporan berhasil ditugaskan kepada polisi dan status diubah menjadi PROSES.');
     }
 }

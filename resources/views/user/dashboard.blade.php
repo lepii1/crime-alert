@@ -61,14 +61,15 @@
 <header class="header shadow-lg">
     <div class="main-content-wrapper py-4 flex justify-between items-center">
         <div class="flex items-center">
-            <i class="fas fa-exclamation-circle mr-3 header-logo text-2xl"></i>
-            <h1 class="text-xl font-semibold hidden sm:block">CRIME ALERT - DASHBOARD SAYA</h1>
+            <ul>
+                <li><a href="{{ url('/') }}"><i class="fas fa-exclamation-circle mr-3 header-logo text-2xl"></i> <span class="text-white text-xl font-semibold"> CRIME ALERT - DASHBOARD SAYA</span></a></li>
+            </ul>
             <h1 class="text-xl font-semibold sm:hidden">DASHBOARD</h1>
         </div>
 
         <div class="flex items-center space-x-4">
             <a href="{{ route('laporan.create') }}" class="px-3 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm whitespace-nowrap">
-                <i class="fas fa-plus mr-1"></i> Buat Laporan
+                <i class="fas fa-plus  mr-1"></i> Buat Laporan
             </a>
 
             {{-- LOGOUT --}}

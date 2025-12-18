@@ -229,8 +229,9 @@
                 </div>
 
                 <div class="sidebar-header">
-                    <i class="fas fa-exclamation-circle" style="color: #e74c3c; font-size: 24px;"></i>
-                    <h2>CRIME ALERT</h2>
+                    <ul>
+                        <li><a href="{{ url('/') }}"><i class="fas fa-exclamation-circle" style="color: #e74c3c; font-size: 24px;"></i> <span class="text-white text-xl font-semibold p-2"> CRIME ALERT</span></a></li>
+                    </ul>
                 </div>
 
                 <nav class="sidebar-nav">

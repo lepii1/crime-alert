@@ -10,7 +10,6 @@ class LaporanController extends Controller
 {
     /**
      * Menampilkan dashboard utama untuk pengguna (user).
-     * Fokus pada laporan yang dibuat oleh pengguna yang sedang login.
      */
     public function dashboard()
     {
@@ -69,12 +68,22 @@ class LaporanController extends Controller
      */
     public function show($id)
     {
-        // PENTING: Mengambil laporan dengan relasi polisi, dan HANYA milik user yang sedang login
         $laporan = Laporan::with('polisi')
             ->where('user_id', Auth::id())
-            ->findOrFail($id); // Jika laporan tidak ditemukan/bukan milik user, akan throw 404
-
-        // Menggunakan view 'laporan.show' sesuai struktur folder Anda
+            ->findOrFail($id);
         return view('laporan.show', compact('laporan'));
+    }
+
+    /**
+     * Menampilkan halaman pengaturan profil untuk pengguna (USER).
+     * Mengirim variabel $user yang diperlukan oleh partial views Breeze.
+     */
+    public function profileSettings()
+    {
+        // PENTING: Mengambil user yang sedang login dan menamainya '$user'
+        $user = Auth::user();
+
+        // Mengirimkan $user agar tersedia di partials update-profile-information-form, dll.
+        return view('laporan.profile', compact('user'));
     }
 }

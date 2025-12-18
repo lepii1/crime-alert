@@ -110,18 +110,21 @@
 
             <!-- Remember Me -->
             <div class="block mb-4">
-                <label for="remember_me" class="inline-flex items-center">
+                <label for="remember_me" class="inline-flex items-center" style="padding-right: 100px;">
                     <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500" name="remember">
                     <span class="ms-2 text-sm text-gray-600">Ingat saya</span>
                 </label>
-            </div>
-
-            <div class="flex items-center justify-between mt-6">
                 @if (Route::has('password.request'))
                     <a class="underline text-sm text-gray-500 hover:text-gray-900 transition" href="{{ route('password.request') }}">
                         Lupa password?
                     </a>
                 @endif
+            </div>
+
+            <div class="flex items-center justify-between mt-6">
+                <a class="underline text-sm text-gray-500 hover:text-gray-900 transition mr-4" href="{{ route('register') }}">
+                    Belum punya akun?
+                </a>
 
                 <button type="submit" class="submit-button">
                     Masuk

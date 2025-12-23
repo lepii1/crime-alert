@@ -85,9 +85,8 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->prefix('user')->group(function () {
-    // FIX: Mengganti Closure dengan pemanggilan Controller LaporanController@dashboard
+    Route::get('/home', [LaporanController::class, 'index'])->name('user.home');
     Route::get('/dashboard', [LaporanController::class, 'dashboard'])->name('user.dashboard');
-
     Route::get('/laporan/create', [LaporanController::class, 'create'])->name('laporan.create');
     Route::post('/laporan', [LaporanController::class, 'store'])->name('laporan.store');
     Route::get('/laporan/{id}', [LaporanController::class, 'show'])->name('laporan.show');

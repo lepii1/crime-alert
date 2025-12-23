@@ -215,6 +215,14 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Lokasi Kejadian
+                        </label>
+                        <input type="text" value="{{ $laporan->lokasi_kejadian }}"
+                               name="lokasi_kejadian" class="w-full border-gray-300 rounded-md shadow-sm" >
+                    </div>
+
+                    <div>
                         <label for="kategori" class="block text-sm font-medium text-gray-700 mb-1">
                             Pilih Kategori
                         </label>
@@ -227,6 +235,7 @@
                             <option value="Lain-lain" {{ $laporan->kategori == 'Lain-lain' ? 'selected' : '' }}>Lain-lain</option>
                         </select>
                     </div>
+
 
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 mb-1">

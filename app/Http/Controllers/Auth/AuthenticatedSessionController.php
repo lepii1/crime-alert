@@ -37,7 +37,7 @@ class AuthenticatedSessionController extends Controller
         }
 
         // jika bukan admin, arahkan ke halaman user biasa
-        return redirect()->route('user.dashboard');
+        return redirect()->route('user.home');
     }
 
     /**

@@ -5,20 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
-    /**
-     * Menampilkan dashboard utama untuk pengguna (user).
-     */
+    public function index()
+    {
+        $laporans = Laporan::with('user')->latest()->get();
+        return view('user.home', compact('laporans'));
+    }
+
     public function dashboard()
     {
-        // Ambil semua laporan yang dibuat oleh pengguna yang sedang login
-        $laporans = Laporan::where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        $laporans = Laporan::where('user_id', Auth::id())->latest()->get();
 
-        // Hitung status ringkasan
         $summary = [
             'total' => $laporans->count(),
             'pending' => $laporans->where('status', 'pending')->count(),
@@ -29,61 +29,53 @@ class LaporanController extends Controller
         return view('user.dashboard', compact('laporans', 'summary'));
     }
 
-    // Menampilkan form laporan
     public function create()
     {
         return view('laporan.create');
     }
 
-    // Simpan laporan baru
     public function store(Request $request)
     {
         $request->validate([
-            'judul_laporan' => 'required|string',
+            'judul_laporan' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'kategori' => 'required|string',
             'tgl_lapor' => 'required|date',
-            'ip_terlapor' => 'nullable|string',
+            'bukti_kejadian' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_identitas' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'lokasi_kejadian' => 'required|string',
             'confirm' => 'required',
         ]);
 
+        // Simpan file ke storage public
+        $buktiPath = $request->file('bukti_kejadian')->store('laporan/bukti', 'public');
+        $identitasPath = $request->file('foto_identitas')->store('laporan/identitas', 'public');
+
         Laporan::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'judul_laporan' => $request->judul_laporan,
             'deskripsi' => $request->deskripsi,
             'kategori' => $request->kategori,
             'tgl_lapor' => $request->tgl_lapor,
             'ip_terlapor' => $request->ip_terlapor,
+            'bukti_kejadian' => $buktiPath,
+            'foto_identitas' => $identitasPath,
+            'lokasi_kejadian' => $request->lokasi_kejadian,
             'status' => 'pending',
         ]);
 
-        // Redirect ke dashboard user + flash message sukses
-        return redirect()
-            ->route('user.dashboard')
-            ->with('success', 'Laporan berhasil dikirim dan sedang diproses!');
+        return redirect()->route('user.dashboard')->with('success', 'Laporan berhasil dikirim!');
     }
 
-    /**
-     * Menampilkan detail laporan pengguna (USER).
-     */
     public function show($id)
     {
-        $laporan = Laporan::with('polisi')
-            ->where('user_id', Auth::id())
-            ->findOrFail($id);
+        $laporan = Laporan::with(['user', 'polisi'])->findOrFail($id);
         return view('laporan.show', compact('laporan'));
     }
 
-    /**
-     * Menampilkan halaman pengaturan profil untuk pengguna (USER).
-     * Mengirim variabel $user yang diperlukan oleh partial views Breeze.
-     */
     public function profileSettings()
     {
-        // PENTING: Mengambil user yang sedang login dan menamainya '$user'
         $user = Auth::user();
-
-        // Mengirimkan $user agar tersedia di partials update-profile-information-form, dll.
         return view('laporan.profile', compact('user'));
     }
 }

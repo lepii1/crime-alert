@@ -5,306 +5,221 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Detail Laporan - Crime Alert</title>
+    <title>Detail Laporan #{{ $laporan->id }} - Admin Panel</title>
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- Alpine.js untuk interaksi sidebar di mobile -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- Leaflet Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; margin: 0; }
 
-        /* CSS Tema Dashboard */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
-        .flex-container {
-            display: flex;
-            min-height: 100vh;
-        }
+        /* Sidebar Styling */
+        .sidebar { width: 250px; background-color: #2c3e50; color: #ecf0f1; height: 100vh; position: fixed; left: 0; top: 0; z-index: 50; transition: 0.3s; transform: translateX(-100%); }
+        @media (min-width: 1024px) { .sidebar { transform: translateX(0); } }
+        .sidebar-open { transform: translateX(0) !important; }
+        .sidebar-nav a { display: flex; align-items: center; padding: 12px 20px; color: #ecf0f1; text-decoration: none; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #34495e; border-left: 4px solid #e74c3c; }
 
-        /* 1. SIDEBAR RESPONSIVE */
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px 0;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 50;
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
-        }
-        @media (min-width: 1024px) {
-            .sidebar {
-                transform: translateX(0);
-            }
-        }
-        .sidebar-open {
-            transform: translateX(0) !important;
-        }
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding-top: 4px;
-            padding-left: 10px;
-        }
-        .sidebar-nav ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active, .sidebar-nav form button:hover {
-            background-color: #34495e;
-            border-left: 3px solid #e74c3c;
-        }
-        .sidebar-nav a i, .sidebar-nav form button i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        .sidebar-nav form button {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-        }
-        .sidebar-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            justify-content: space-between;
-        }
+        /* Layout */
+        .main-content { padding: 30px; margin-left: 0; transition: 0.3s; }
+        @media (min-width: 1024px) { .main-content { margin-left: 250px; } }
 
-        /* 2. KONTEN UTAMA RESPONSIVE */
-        .main-content {
-            padding: 30px;
-            flex-grow: 1;
-            margin-left: 0;
-        }
-        @media (min-width: 1024px) {
-            .main-content {
-                margin-left: 250px;
-            }
-        }
-        .detail-header {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .status-badge {
-            padding: 4px 10px;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        .status-pending { background-color: #fde68a; color: #b45309; }
-        .status-proses { background-color: #bfdbfe; color: #1e40af; }
+        /* Badges */
+        .status-badge { padding: 5px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-proses { background-color: #dbeafe; color: #1e40af; }
         .status-selesai { background-color: #d1fae5; color: #065f46; }
 
-        .card-detail {
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 24px;
-        }
+        .card-detail { background: #fff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 25px; }
+        .img-preview { width: 100%; max-height: 300px; object-fit: contain; border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; }
+        #map { height: 300px; border-radius: 8px; }
     </style>
 
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body x-data="{ open: false }">
 
-{{-- TOMBOL HAMBURGER --}}
-<div @click="open = true"
-     class="lg:hidden fixed top-3 right-1 m-4 p-2 bg-indigo-600 text-white rounded-lg shadow-lg cursor-pointer z-[60]">
+{{-- MOBILE MENU --}}
+<div @click="open = true" class="lg:hidden fixed top-4 right-4 z-[60] bg-indigo-600 p-3 rounded-full text-white shadow-xl cursor-pointer">
     <i class="fas fa-bars"></i>
 </div>
 
-<div class="flex-container">
-
+<div class="flex">
     {{-- SIDEBAR --}}
-    <div class="sidebar" :class="{'sidebar-open': open}">
-        <div class="sidebar-content">
-            <div>
-                {{-- Tombol Tutup (Hanya di Mobile) --}}
-                <div class="lg:hidden absolute top-0 right-0 m-4 p-2 text-white cursor-pointer" @click="open = false">
-                    <i class="fas fa-times text-xl"></i>
-                </div>
-
-                <div class="sidebar-header">
-                    <i class="fas fa-exclamation-circle" style="color: #e74c3c; font-size: 24px;"></i>
-                    <h2>CRIME ALERT</h2>
-                </div>
-
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li><a href="{{ route('admin.dashboard') }}" @click="open = false"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li><a href="{{ route('admin.laporan.index') }}" class="active" @click="open = false"><i class="fas fa-bell"></i> Laporan Masuk</a></li>
-                        <li><a href="{{ route('admin.laporan.reports') }}" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
-                        <li><a href="{{ route('profile.edit') }}" @click="open = false"><i class="fas fa-cog"></i> Settings</a></li>
-                    </ul>
-                </nav>
+    <div class="sidebar shadow-2xl" :class="{'sidebar-open': open}">
+        <div class="flex flex-col h-full">
+            <div class="p-6 flex items-center border-b border-gray-700">
+                <i class="fas fa-shield-alt text-red-500 text-2xl mr-3"></i>
+                <span class="font-bold text-lg tracking-wider uppercase">Crime Alert</span>
             </div>
-
-            {{-- LOGOUT --}}
-            <div class="p-4 pt-0">
-                <form method="POST" action="{{ route('logout') }}" @click="open = false">
+            <nav class="sidebar-nav mt-4 flex-grow">
+                <a href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line mr-3"></i> Dashboard</a>
+                <a href="{{ route('admin.laporan.index') }}" class="active"><i class="fas fa-list-ul mr-3"></i> Semua Laporan</a>
+                <a href="#"><i class="fas fa-users-cog mr-3"></i> Data Petugas</a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                    <button type="submit" class="flex items-center w-full text-left p-3 hover:bg-gray-700 rounded-lg text-red-400">
+                        <i class="fas fa-power-off mr-3"></i> Keluar Sistem
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
-    {{-- OVERLAY --}}
-    <div x-show="open"
-         @click="open = false"
-         class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
-         style="display: none;">
-    </div>
+    {{-- OVERLAY MOBILE --}}
+    <div x-show="open" @click="open = false" class="fixed inset-0 bg-black/50 z-40 lg:hidden"></div>
 
-    {{-- KONTEN UTAMA --}}
-    <div class="main-content">
-        <h1 class="detail-header">
-            {{ __('Detail Laporan') }}
-        </h1>
+    {{-- MAIN CONTENT --}}
+    <div class="main-content w-full">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-800">Detail Laporan</h1>
+            <div class="mt-4 md:mt-0">
+                <span class="status-badge status-{{ strtolower($laporan->status) }}">
+                    Status : {{ $laporan->status }}
+                </span>
+            </div>
+        </div>
 
-        <div class="max-w-4xl mx-auto">
-            <div class="card-detail space-y-6">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-                {{-- Pesan sukses --}}
-                @if (session('success'))
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4 shadow-sm">
-                        {{ session('success') }}
-                    </div>
-                @endif
+            {{-- KOLOM KIRI: DATA LAPORAN & BUKTI --}}
+            <div class="xl:col-span-2 space-y-8">
+                <div class="card-detail">
+                    <h2 class="text-xl font-bold mb-6 border-b pb-2 flex items-center">
+                        <i class="fas fa-info-circle mr-2 text-indigo-500"></i> Informasi Laporan
+                    </h2>
 
-                {{-- DETAIL LAPORAN UTAMA --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 pb-6 border-b border-gray-100">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-1">Judul Laporan</h3>
-                        <p class="text-gray-900 font-medium">{{ $laporan->judul_laporan ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-1">Kategori</h3>
-                        <p class="text-gray-900 font-medium">{{ $laporan->kategori ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-1">Tanggal Lapor</h3>
-                        <p class="text-gray-900">{{ $laporan->tgl_lapor ? \Carbon\Carbon::parse($laporan->tgl_lapor)->format('d F Y') : '-' }}</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-1">Pelapor</h3>
-                        <p class="text-gray-900">{{ $laporan->user->name ?? 'User Dihapus' }}</p>
-                        <p class="text-gray-500 text-sm">{{ $laporan->user->email ?? '' }}</p>
-                    </div>
-                </div>
-
-                {{-- DESKRIPSI DAN STATUS --}}
-                <div class="space-y-4 pt-4 border-b border-gray-100 pb-6">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-2">Deskripsi Laporan</h3>
-                        <div class="p-3 bg-gray-50 rounded-lg text-gray-700 text-sm">
-                            {{ $laporan->deskripsi ?? 'Tidak ada deskripsi.' }}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Judul Kejadian</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ $laporan->judul_laporan }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Kategori</p>
+                            <p class="text-gray-900 font-medium bg-gray-100 inline-block px-3 py-1 rounded">{{ $laporan->kategori }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Kronologi / Deskripsi</p>
+                            <p class="text-gray-700 mt-2 bg-gray-50 p-4 rounded-lg border border-gray-100 whitespace-pre-line">{{ $laporan->deskripsi }}</p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase">Lokasi Kejadian</p>
+                            <p class="text-gray-700 mt-2 bg-gray-50 p-4 rounded-lg border border-gray-100 whitespace-pre-line">{{ $laporan->lokasi_kejadian }}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-1">Status Laporan</h3>
-                        <span class="status-badge status-{{ strtolower($laporan->status ?? 'pending') }}">
-                                {{ ucfirst($laporan->status ?? 'pending') }}
-                            </span>
+                {{-- BUKTI FOTO & MAP --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card-detail">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Foto Bukti Kejadian</h3>
+                        @if($laporan->bukti_kejadian)
+                            <img src="{{ asset('storage/' . $laporan->bukti_kejadian) }}" class="img-preview shadow-sm" alt="Bukti">
+                        @else
+                            <div class="bg-gray-100 h-48 rounded flex items-center justify-center text-gray-400 italic text-sm">Tidak ada foto bukti</div>
+                        @endif
+                    </div>
+                    <div class="card-detail">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4 uppercase tracking-wider">Lokasi di Peta</h3>
+                        @if($laporan->latitude && $laporan->longitude)
+                            <div id="map"></div>
+                        @else
+                            <div class="bg-gray-100 h-48 rounded flex items-center justify-center text-gray-400 italic text-sm">Koordinat tidak tersedia</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- KOLOM KANAN: PELAPOR & PETUGAS --}}
+            <div class="space-y-8">
+                {{-- VERIFIKASI PELAPOR --}}
+                <div class="card-detail">
+                    <h2 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-user-check mr-2 text-green-500"></i> Identitas Pelapor
+                    </h2>
+                    <div class="mb-4">
+                        <p class="text-sm font-bold text-gray-800">{{ $laporan->user->name }}</p>
+                        <p class="text-xs text-gray-500">{{ $laporan->user->email }}</p>
+                        <p class="text-xs text-gray-400 mt-1">IP: {{ $laporan->ip_terlapor ?? 'N/A' }}</p>
+                    </div>
+
+                    <div class="mt-4 border-t pt-4">
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-2">Foto KTP / Identitas</p>
+                        @if($laporan->foto_identitas)
+                            <img src="{{ asset('storage/' . $laporan->foto_identitas) }}" class="img-preview cursor-pointer hover:opacity-90 transition" alt="KTP" onclick="window.open(this.src)">
+                        @else
+                            <div class="bg-red-50 text-red-500 p-3 rounded text-xs">Foto Identitas Belum Diunggah</div>
+                        @endif
                     </div>
                 </div>
 
-
-                {{-- 🟢 KONDISI PENUGASAN POLISI --}}
-                <div class="pt-4">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center">
+                {{-- PENUGASAN POLISI --}}
+                <div class="card-detail">
+                    <h2 class="text-lg font-bold mb-4 flex items-center">
                         <i class="fas fa-user-shield mr-2 text-indigo-600"></i> Penugasan Petugas
-                    </h3>
+                    </h2>
 
                     @if ($laporan->polisi)
-                        {{-- KONDISI 1: SUDAH DITUGASKAN --}}
-                        <div class="bg-indigo-50 border-l-4 border-indigo-600 p-4 rounded-lg shadow-sm">
-                            <p class="font-medium text-indigo-800 mb-2">
-                                <i class="fas fa-check-circle mr-1"></i> Laporan ini ditugaskan kepada:
-                            </p>
-                            <p class="text-lg font-bold text-indigo-900">{{ $laporan->polisi->nama ?? 'Petugas Tidak Diketahui' }}</p>
-                            <p class="text-indigo-600 text-sm">Jabatan: {{ $laporan->polisi->jabatan ?? '-' }}</p>
+                        <div class="p-4 bg-indigo-50 rounded-xl border-l-4 border-indigo-600 shadow-inner">
+                            <p class="text-xs text-indigo-400 font-bold uppercase">Petugas Terpilih:</p>
+                            <p class="text-lg font-bold text-indigo-900">{{ $laporan->polisi->nama }}</p>
+                            <p class="text-indigo-600 text-sm italic">{{ $laporan->polisi->jabatan ?? 'Petugas Penanganan' }}</p>
                         </div>
                     @else
-                        {{-- KONDISI 2: BELUM DITUGASKAN (Tampilkan Formulir) --}}
-                        <div class="bg-red-50 border-l-4 border-red-600 p-4 rounded-lg shadow-sm">
-                            <p class="font-medium text-red-800 mb-3">
-                                <i class="fas fa-exclamation-triangle mr-1"></i> Laporan ini belum ditugaskan.
-                            </p>
-
-                            <form action="{{ route('admin.laporan.assign.store', $laporan->id) }}" method="POST" class="space-y-3">
+                        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                            <form action="{{ route('admin.laporan.assign.store', $laporan->id) }}" method="POST">
                                 @csrf
-                                <label for="polisi_id" class="block text-sm font-medium text-gray-700">Tugaskan ke Polisi:</label>
-                                <select name="polisi_id" id="polisi_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                                    <option value="">-- Pilih Polisi --</option>
+                                <label class="block text-xs font-bold text-red-600 uppercase mb-2">Belum Ada Petugas</label>
+                                <select name="polisi_id" class="w-full border-gray-300 rounded-lg text-sm mb-3">
+                                    <option value="">-- Pilih Petugas --</option>
                                     @foreach($polisis as $p)
-                                        <option value="{{ $p->id }}" {{ old('polisi_id') == $p->id ? 'selected' : '' }}>
-                                            {{ $p->nama }} ({{ $p->jabatan ?? 'Tidak Diketahui' }})
-                                        </option>
+                                        <option value="{{ $p->id }}">{{ $p->nama }} ({{ $p->jabatan }})</option>
                                     @endforeach
                                 </select>
-
-                                <button type="submit" class="w-full mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition">
-                                    Tugaskan Sekarang
+                                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition">
+                                    Konfirmasi Penugasan
                                 </button>
                             </form>
                         </div>
                     @endif
                 </div>
 
-                {{-- TOMBOL AKSI --}}
-                <div class="pt-6 border-t border-gray-100 flex justify-end space-x-3">
-                    <a href="{{ route('admin.laporan.index') }}"
-                       class="inline-block px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-                        ← Kembali
+                <div class="flex flex-col gap-3">
+                    <a href="{{ route('admin.laporan.edit', $laporan->id) }}" class="w-full text-center bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-edit mr-2"></i> Update Status Laporan
                     </a>
-                    <a href="{{ route('admin.laporan.edit', $laporan->id) }}"
-                       class="inline-block px-4 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 transition">
-                        Edit Status Laporan
+                    <a href="{{ route('admin.laporan.index') }}" class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-xl transition">
+                        <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{{-- Leaflet Map Script --}}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const lat = {{ $laporan->latitude ?? 0 }};
+        const lng = {{ $laporan->longitude ?? 0 }};
+
+        if (lat !== 0 && lng !== 0) {
+            const map = L.map('map').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map).bindPopup('Titik Kejadian').openPopup();
+        }
+    });
+</script>
+
 </body>
 </html>

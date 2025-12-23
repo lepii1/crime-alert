@@ -17,7 +17,12 @@ return new class extends Migration {
             $table->string('kategori')->default('lain-lain');
             $table->date('tgl_lapor');
             $table->string('ip_terlapor')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->enum('status', ['pending', 'proses', 'selesai'])->default('pending');
+            $table->string('bukti_kejadian')->nullable();
+            $table->string('foto_identitas')->nullable();
+            $table->string('lokasi_kejadian')->nullable();
             $table->timestamps();
         });
     }

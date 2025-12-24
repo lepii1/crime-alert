@@ -5,345 +5,247 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Analisis Laporan - Crime Alert</title>
+    <title>Analisis Laporan - Admin Crime Alert</title>
 
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
-        /* CSS Tema Dashboard */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-        }
-        .flex-container {
-            display: flex;
-            min-height: 100vh;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; margin: 0; }
 
-        /* SIDEBAR RESPONSIVE */
-        .sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 20px 0;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 50;
-            transition: transform 0.3s ease-in-out;
-            transform: translateX(-100%);
-        }
-        @media (min-width: 1024px) {
-            .sidebar {
-                transform: translateX(0);
-            }
-        }
-        .sidebar-open {
-            transform: translateX(0) !important;
-        }
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            padding-left: 10px;
-        }
-        .sidebar-nav ul {
-            list-style: none;
-            padding: 0;
-        }
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        .sidebar-nav a:hover, .sidebar-nav a.active, .sidebar-nav form button:hover {
-            background-color: #34495e;
-            border-left: 3px solid #e74c3c;
-        }
-        .sidebar-nav a i, .sidebar-nav form button i {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        .sidebar-nav form button {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #ecf0f1;
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-        }
-        .sidebar-content {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            justify-content: space-between;
-        }
+        .sidebar { width: 260px; background-color: #2c3e50; color: #ecf0f1; height: 100vh; position: fixed; left: 0; top: 0; z-index: 50; transition: 0.3s ease-in-out; transform: translateX(-100%); }
+        @media (min-width: 1024px) { .sidebar { transform: translateX(0); } }
+        .sidebar-open { transform: translateX(0) !important; }
 
-        /* KONTEN UTAMA RESPONSIVE */
-        .main-content {
-            padding: 30px;
-            flex-grow: 1;
-            margin-left: 0;
-        }
-        @media (min-width: 1024px) {
-            .main-content {
-                margin-left: 250px;
-            }
-        }
-        .charts-header {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .chart-card {
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            padding: 25px;
-            /* Hapus min-height agar chart.js yang mengontrol */
-        }
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 20px;
-        }
-        @media (min-width: 768px) {
-            .chart-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        /* Kontainer Chart agar Chart.js bisa mengatur tinggi */
-        .chart-container {
-            position: relative;
-            height: 384px; /* Default height (h-96) */
-            max-height: 384px; /* Max height */
-        }
-        @media (min-width: 1024px) {
-            .chart-line-container {
-                height: 450px; /* Line chart lebih tinggi di desktop */
-                max-height: 450px;
-            }
-        }
+        .sidebar-nav a { display: flex; align-items: center; padding: 14px 24px; color: #ecf0f1; text-decoration: none; border-left: 4px solid transparent; transition: 0.2s; font-size: 0.9rem; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #34495e; border-left: 4px solid #e74c3c; color: #fff; font-weight: 600; }
+
+        .main-content { padding: 30px; margin-left: 0; transition: 0.3s; }
+        @media (min-width: 1024px) { .main-content { margin-left: 260px; } }
+
+        .chart-card { background: #fff; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 30px; border: 1px solid #edf2f7; transition: 0.3s; }
+        .chart-card:hover { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+
+        .select-custom { @apply bg-gray-50 border border-gray-100 text-gray-700 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 outline-none font-bold uppercase tracking-tighter; }
+
+        /* Tombol PDF Modern */
+        .btn-pdf { @apply bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-red-100 transition-all active:scale-95 flex items-center; }
     </style>
 
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body x-data="{ open: false }">
 
-{{-- TOMBOL HAMBURGER --}}
-<div @click="open = true"
-     class="lg:hidden fixed top-0 right-0 m-4 p-2 bg-indigo-600 text-white rounded-lg shadow-lg cursor-pointer z-[60]">
+{{-- HAMBURGER --}}
+<div @click="open = true" class="lg:hidden fixed top-4 right-4 z-[60] bg-indigo-600 p-3 rounded-full text-white shadow-xl cursor-pointer active:scale-95 transition">
     <i class="fas fa-bars"></i>
 </div>
 
-<div class="flex-container">
-
+<div class="flex">
     {{-- SIDEBAR --}}
-    <div class="sidebar" :class="{'sidebar-open': open}">
-        <div class="sidebar-content">
-            <div>
-                {{-- Tombol Tutup (Hanya di Mobile) --}}
-                <div class="lg:hidden absolute top-0 right-0 m-4 p-2 text-white cursor-pointer" @click="open = false">
-                    <i class="fas fa-times text-xl"></i>
-                </div>
-
-                <div class="sidebar-header">
-                    <ul>
-                        <li><a href="{{ url('/') }}"><i class="fas fa-exclamation-circle" style="color: #e74c3c; font-size: 24px;"></i> <span class="text-white text-xl font-semibold p-2"> CRIME ALERT</span></a></li>
-                    </ul>
-                </div>
-
-                <nav class="sidebar-nav">
-                    <ul>
-                        <li><a href="{{ route('admin.dashboard') }}" @click="open = false"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                        <li><a href="{{ route('admin.laporan.index') }}" @click="open = false"><i class="fas fa-bell"></i> Laporan Masuk</a></li>
-                        <li><a href="{{ route('admin.laporan.reports') }}" class="active" @click="open = false"><i class="fas fa-chart-bar"></i> Reports</a></li>
-                        <li><a href="{{ route('profile.edit') }}" @click="open = false"><i class="fas fa-cog"></i> Settings</a></li>
-                    </ul>
-                </nav>
+    <div class="sidebar shadow-2xl" :class="{'sidebar-open': open}">
+        <div class="flex flex-col h-full">
+            <div class="p-8 border-b border-gray-700">
+                <a href="{{ url('/') }}" class="flex items-center group">
+                    <i class="fas fa-exclamation-circle text-red-500 text-3xl mr-3 group-hover:rotate-12 transition-transform"></i>
+                    <span class="font-black text-xl tracking-tighter uppercase text-white">Crime Alert</span>
+                </a>
             </div>
 
-            {{-- LOGOUT --}}
-            <div class="p-4 pt-0">
-                <form method="POST" action="{{ route('logout') }}" @click="open = false">
+            <nav class="sidebar-nav mt-6 flex-grow">
+                <a href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt mr-3 w-5 text-center"></i> Dashboard</a>
+                <a href="{{ route('admin.laporan.index') }}"><i class="fas fa-bell mr-3 w-5 text-center"></i> Laporan Masuk</a>
+                <a href="#" class="active"><i class="fas fa-chart-bar mr-3 w-5 text-center"></i> Analisis Visual</a>
+                <a href="{{ route('profile.edit') }}"><i class="fas fa-cog mr-3 w-5 text-center"></i> Pengaturan</a>
+            </nav>
+
+            <div class="p-6 border-t border-gray-700">
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                    <button type="submit" class="flex items-center w-full text-left p-3 hover:bg-red-500/10 rounded-xl text-red-400 font-bold uppercase text-[10px] tracking-widest transition">
+                        <i class="fas fa-power-off mr-3"></i> Logout
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
-    {{-- OVERLAY --}}
-    <div x-show="open"
-         @click="open = false"
-         class="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
-         style="display: none;">
-    </div>
+    {{-- OVERLAY MOBILE --}}
+    <div x-show="open" @click="open = false" x-cloak class="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"></div>
 
-    {{-- KONTEN UTAMA --}}
-    <div class="main-content">
-        <h1 class="charts-header">Analisis Visual Laporan Kejahatan</h1>
+    {{-- MAIN CONTENT --}}
+    <div class="main-content w-full">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-gray-800 tracking-tight">Analisis Visual</h1>
+                <p class="text-gray-500 font-medium">Monitoring statistik dan tren laporan kejahatan.</p>
+            </div>
 
-        <div class="chart-grid">
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <form method="GET" action="{{ route('admin.laporan.reports') }}" class="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-4">Filter Tahun:</span>
+                    <div class="min-w-[120px]">
+                        <select name="year" onchange="this.form.submit()" class="select-custom border-none">
+                            @foreach($availableYears as $year)
+                                <option value="{{ $year }}" {{ request('year', date('Y')) == $year ? 'selected' : '' }}>{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </form>
 
-            {{-- CHART 1: TREND BULANAN --}}
-            <div class="chart-card md:col-span-2">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Tren Laporan 12 Bulan Terakhir</h3>
-                <div class="chart-container chart-line-container">
+                {{-- TOMBOL CETAK PDF --}}
+                <a href="{{ route('admin.laporan.exportPdf', ['year' => request('year', date('Y'))]) }}" class="btn-pdf">
+                    <i class="fas fa-file-pdf mr-3 text-sm"></i> Cetak Laporan
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div class="chart-card xl:col-span-2">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Tren Laporan Bulanan ({{ request('year', date('Y')) }})</h3>
+                    <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                </div>
+                <div class="relative h-[350px]">
                     <canvas id="monthlyTrendChart"></canvas>
                 </div>
             </div>
 
-            {{-- CHART 2: DISTRIBUSI KATEGORI (PIE) --}}
             <div class="chart-card">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Distribusi Berdasarkan Kategori</h3>
-                <div class="chart-container">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Perbandingan Antar Tahun</h3>
+                <div class="relative h-[350px]">
+                    <canvas id="yearlyComparisonChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Distribusi Kategori</h3>
+                <div class="relative h-[300px]">
                     <canvas id="categoryDistributionChart"></canvas>
                 </div>
             </div>
 
-            {{-- CHART 3: STATUS PENANGANAN (DOUGHNUT) --}}
-            <div class="chart-card">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Status Penanganan Laporan</h3>
-                <div class="chart-container">
+            <div class="chart-card xl:col-span-2">
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">Rasio Status Penanganan</h3>
+                <div class="relative h-[300px]">
                     <canvas id="statusDistributionChart"></canvas>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    // Data dari Controller (disediakan oleh AdminLaporanController@reports)
     const monthlyData = @json($monthlyChartData);
+    const yearlyData = @json($yearlyChartData);
     const categoryData = @json($categoryChartData);
     const statusData = @json($statusChartData);
 
-    // Warna Primer
-    const colorAccent = 'rgb(231, 76, 60)'; // #e74c3c
+    Chart.defaults.font.family = 'Poppins';
+    Chart.defaults.color = '#94a3b8';
 
-    // Fungsi untuk menghasilkan warna cerah unik
-    const generateColor = (index) => {
-        const colors = [
-            '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'
-        ];
-        return colors[index % colors.length];
-    };
-
-    // ===================================
-    // 1. CHART TREND BULANAN (LINE CHART)
-    // ===================================
     new Chart(document.getElementById('monthlyTrendChart'), {
         type: 'line',
         data: {
             labels: monthlyData.labels,
             datasets: [{
-                label: 'Jumlah Laporan',
+                label: 'Laporan',
                 data: monthlyData.data,
-                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                borderColor: colorAccent,
-                borderWidth: 2,
+                borderColor: '#e74c3c',
+                backgroundColor: 'rgba(231, 76, 60, 0.05)',
+                borderWidth: 4,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointRadius: 6,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#e74c3c',
+                pointBorderWidth: 3
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Jumlah'
-                    }
-                }
+                y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
+                x: { grid: { display: false } }
             }
         }
     });
 
-    // ===================================
-    // 2. CHART DISTRIBUSI KATEGORI (PIE CHART)
-    // ===================================
+    new Chart(document.getElementById('yearlyComparisonChart'), {
+        type: 'bar',
+        data: {
+            labels: yearlyData.labels,
+            datasets: [{
+                data: yearlyData.data,
+                backgroundColor: '#2c3e50',
+                borderRadius: 12,
+                hoverBackgroundColor: '#e74c3c'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
     new Chart(document.getElementById('categoryDistributionChart'), {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: categoryData.labels,
             datasets: [{
                 data: categoryData.data,
-                backgroundColor: categoryData.labels.map((_, i) => generateColor(i)),
-                hoverOffset: 4
+                backgroundColor: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'],
+                borderWidth: 0,
+                hoverOffset: 15
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '75%',
             plugins: {
                 legend: {
-                    position: 'right',
-                },
-                title: {
-                    display: true,
-                    text: 'Laporan Berdasarkan Jenis Kejahatan'
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 20, font: { size: 10, weight: 'bold' } }
                 }
             }
         }
     });
 
-    // ===================================
-    // 3. CHART STATUS PENANGANAN (DOUGHNUT)
-    // ===================================
     new Chart(document.getElementById('statusDistributionChart'), {
         type: 'doughnut',
         data: {
             labels: statusData.labels,
             datasets: [{
                 data: statusData.data,
-                backgroundColor: [
-                    '#f39c12', // Pending (Kuning)
-                    '#3498db', // Proses (Biru)
-                    '#27ae60'  // Selesai (Hijau)
-                ],
-                hoverOffset: 4
+                backgroundColor: ['#f1c40f', '#3498db', '#2ecc71'],
+                borderWidth: 0,
+                hoverOffset: 15
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '75%',
             plugins: {
                 legend: {
                     position: 'right',
-                },
-                title: {
-                    display: true,
-                    text: 'Rasio Status Laporan'
+                    labels: {
+                        usePointStyle: true,
+                        padding: 25,
+                        font: { size: 12, weight: 'bold' }
+                    }
                 }
             }
         }

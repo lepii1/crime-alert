@@ -11,20 +11,20 @@ class Laporan extends Model
 
     protected $fillable = [
         'user_id',
+        'polisi_id',
         'judul_laporan',
         'deskripsi',
+        'lokasi_kejadian', // TAMBAHKAN INI
         'kategori',
         'tgl_lapor',
         'ip_terlapor',
+        'latitude',
+        'longitude',
         'status',
-        'polisi_id',
         'bukti_kejadian',
-        'foto_identitas',
-        'lokasi_kejadian'
-
+        'foto_identitas'
     ];
 
-    // Relasi ke user
     public function user()
     {
         return $this->belongsTo(User::class);

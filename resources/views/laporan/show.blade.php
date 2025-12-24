@@ -250,7 +250,10 @@
 
         /* Status Badges - Consistent with Dashboard */
         .status-badge {
-            @apply px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm;
+            padding: 5px 15px;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 600;
         }
         .status-pending { background-color: #fef3c7; color: #92400e; }
         .status-proses { background-color: #dbeafe; color: #1e40af; }
@@ -277,10 +280,18 @@
 
         /* Image Display */
         .evidence-container {
-            @apply max-w-md mx-auto bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-lg;
+            @apply bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shadow-lg;
         }
         .evidence-img {
-            @apply w-full h-auto object-contain max-h-[400px] block;
+            @apply object-contain max-h-[250px] block;
+        }
+
+        .main-content-wrapper {
+            max-width: 4xl;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
     </style>
 
@@ -290,25 +301,16 @@
 
 {{-- HEADER --}}
 <header class="header shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto py-4 px-6 flex justify-between items-center">
+    <div class="main-content-wrapper py-4 flex justify-between items-center">
         <div class="flex items-center group">
             <a href="{{ url('/') }}" class="flex items-center">
-                <i class="fas fa-exclamation-circle mr-3 header-logo text-3xl group-hover:rotate-12 transition-transform"></i>
-                <span class="text-white text-xl font-extrabold tracking-tight hidden sm:block uppercase">Crime Alert</span>
+                <i class="fas fa-exclamation-circle mr-3 header-logo text-3xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-white text-xl font-semibold"> CRIME ALERT - DETAIL</span>
             </a>
         </div>
 
-        <nav class="hidden lg:flex items-center space-x-2">
-            <a href="{{ route('user.home') }}" class="nav-item">
-                <i class="fas fa-rss mr-2 text-xs"></i> Feed Beranda
-            </a>
-            <a href="{{ route('user.dashboard') }}" class="nav-item">
-                <i class="fas fa-th-large mr-2 text-xs"></i> Dashboard
-            </a>
-        </nav>
-
         <div class="flex items-center space-x-3">
-            <a href="{{ route('user.dashboard') }}" class="px-5 py-2 bg-gray-600 text-white rounded-xl font-bold text-xs hover:bg-gray-700 transition uppercase tracking-wider hidden sm:flex items-center shadow-lg">
+            <a href="{{ route('user.dashboard') }}" class="px-4 py-2 bg-gray-600 text-white rounded-xl font-bold text-xs hover:bg-gray-700 transition uppercase tracking-wider hidden sm:flex items-center">
                 <i class="fas fa-arrow-left mr-2"></i> Dashboard
             </a>
 
@@ -319,17 +321,9 @@
                 </button>
             </form>
 
-            <button @click="mobileMenu = !mobileMenu" class="lg:hidden p-2 text-white">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
         </div>
     </div>
 
-    {{-- Mobile Menu --}}
-    <div x-show="mobileMenu" x-cloak class="lg:hidden bg-[#34495e] border-t border-white/10 p-4 space-y-2">
-        <a href="{{ route('user.home') }}" class="block p-3 text-white font-medium hover:bg-white/10 rounded-lg">Beranda</a>
-        <a href="{{ route('user.dashboard') }}" class="block p-3 text-white font-medium hover:bg-white/10 rounded-lg">Dashboard Saya</a>
-    </div>
 </header>
 
 <main class="py-12 px-6">
@@ -412,7 +406,7 @@
 
                 <div>
                     <h3 class="label-text mb-3">Kronologi / Deskripsi Kejadian</h3>
-                    <div class="p-6 bg-indigo-50/30 rounded-3xl text-gray-700 text-sm leading-relaxed border border-indigo-100/50 italic">
+                    <div class="p-6 bg-gray-50 rounded-2xl border border-gray-100 text-sm text-gray-700 flex items-start group hover:border-red-200 transition-colors italic">
                         "{{ $laporan->deskripsi ?? 'Tidak ada deskripsi tersedia.' }}"
                     </div>
                 </div>
@@ -459,19 +453,11 @@
                 </div>
             </div>
         </div>
-
-        {{-- BACK BUTTON --}}
-        <div class="mt-12 pt-10 border-t flex justify-center">
-            <a href="{{ route('user.dashboard') }}"
-               class="px-12 py-4 bg-gray-800 text-white rounded-2xl hover:bg-black transition-all font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl transform active:scale-95">
-                <i class="fas fa-chevron-left mr-3"></i> Kembali ke Dashboard
-            </a>
-        </div>
     </div>
 </main>
 
-<footer class="py-12 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-    Crime Alert Security System &bull; Secure Protocol {{ date('Y') }}
+<footer class="mt-auto py-8 text-center text-gray-400 text-xs font-medium">
+    &copy; {{ date('Y') }} Crime Alert Report System. Seluruh hak cipta dilindungi.
 </footer>
 
 </body>

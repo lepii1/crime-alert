@@ -18,14 +18,12 @@ class LaporanController extends Controller
     public function dashboard()
     {
         $laporans = Laporan::where('user_id', Auth::id())->latest()->get();
-
         $summary = [
             'total' => $laporans->count(),
             'pending' => $laporans->where('status', 'pending')->count(),
             'proses' => $laporans->where('status', 'proses')->count(),
             'selesai' => $laporans->where('status', 'selesai')->count(),
         ];
-
         return view('user.dashboard', compact('laporans', 'summary'));
     }
 
@@ -36,6 +34,7 @@ class LaporanController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi data
         $request->validate([
             'judul_laporan' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -44,23 +43,29 @@ class LaporanController extends Controller
             'bukti_kejadian' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'foto_identitas' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'lokasi_kejadian' => 'required|string',
-            'confirm' => 'required',
+            'confirm' => 'accepted', // Menggunakan accepted untuk checkbox
+        ], [
+            // Pesan custom agar mudah didebug
+            'confirm.accepted' => 'Anda harus menyetujui konfirmasi laporan.',
+            'bukti_kejadian.required' => 'Foto bukti kejadian wajib diunggah.',
+            'foto_identitas.required' => 'Foto KTP wajib diunggah.'
         ]);
 
         // Simpan file ke storage public
         $buktiPath = $request->file('bukti_kejadian')->store('laporan/bukti', 'public');
         $identitasPath = $request->file('foto_identitas')->store('laporan/identitas', 'public');
 
+        // Simpan ke database
         Laporan::create([
             'user_id' => Auth::id(),
             'judul_laporan' => $request->judul_laporan,
             'deskripsi' => $request->deskripsi,
             'kategori' => $request->kategori,
             'tgl_lapor' => $request->tgl_lapor,
-            'ip_terlapor' => $request->ip_terlapor,
+            'lokasi_kejadian' => $request->lokasi_kejadian,
+            'ip_terlapor' => $request->ip_terlapor ?? $request->ip(), // Fallback ke IP server jika JS gagal
             'bukti_kejadian' => $buktiPath,
             'foto_identitas' => $identitasPath,
-            'lokasi_kejadian' => $request->lokasi_kejadian,
             'status' => 'pending',
         ]);
 
@@ -71,11 +76,5 @@ class LaporanController extends Controller
     {
         $laporan = Laporan::with(['user', 'polisi'])->findOrFail($id);
         return view('laporan.show', compact('laporan'));
-    }
-
-    public function profileSettings()
-    {
-        $user = Auth::user();
-        return view('laporan.profile', compact('user'));
     }
 }

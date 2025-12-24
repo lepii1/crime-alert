@@ -143,40 +143,54 @@
         .report-card { @apply bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
         .nav-item { @apply flex items-center px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium hover:bg-white/10; }
         .nav-item.active { @apply bg-white/20 text-white font-bold; }
+        .main-content-wrapper {
+            max-width: 7xl;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body x-data="{ mobileMenu: false }">
 
 <header class="header shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto py-4 px-6 flex justify-between items-center">
+    <div class="main-content-wrapper py-4 flex justify-between items-center">
         <div class="flex items-center group">
             <a href="{{ url('/') }}" class="flex items-center">
-                <i class="fas fa-exclamation-circle mr-3 header-logo text-3xl group-hover:rotate-12 transition-transform"></i>
-                <span class="text-white text-xl font-extrabold tracking-tight hidden sm:block uppercase">Crime Alert</span>
+                <i class="fas fa-exclamation-circle mr-3 header-logo text-3xl group-hover:scale-110 transition-transform"></i>
+                <span class="text-white text-xl font-semibold"> CRIME ALERT - BERANDA</span>
             </a>
         </div>
 
-        <nav class="hidden lg:flex items-center space-x-2">
-            <a href="{{ route('user.home') }}" class="nav-item active"><i class="fas fa-rss mr-2 text-xs"></i> Feed Beranda</a>
-            <a href="{{ route('user.dashboard') }}" class="nav-item"><i class="fas fa-th-large mr-2 text-xs"></i> Dashboard</a>
-        </nav>
-
         <div class="flex items-center space-x-3">
+            <nav class="hidden lg:flex items-center space-x-2">
+                <a href="{{ route('user.dashboard') }}" class="px-5 py-2 bg-gray-600 text-white rounded-xl font-bold text-xs hover:bg-gray-700 transition uppercase tracking-wider hidden sm:flex items-center shadow-lg">
+                    Dashboard
+                </a>
+            </nav>
             <a href="{{ route('laporan.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg active:scale-95 hidden sm:flex items-center">
                 <i class="fas fa-plus-circle mr-2"></i> Buat Laporan
             </a>
+
             <form method="POST" action="{{ route('logout') }}" class="inline">
                 @csrf
-                <button type="submit" class="p-2.5 text-gray-400 hover:text-white transition-colors"><i class="fas fa-sign-out-alt text-lg"></i></button>
+                <button type="submit" class="p-2.5 text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
+                </button>
             </form>
-            <button @click="mobileMenu = !mobileMenu" class="lg:hidden p-2 text-white"><i class="fas fa-bars text-xl"></i></button>
+
+            <button @click="mobileMenu = !mobileMenu" class="lg:hidden p-2 text-white">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
         </div>
     </div>
 
+    {{-- Mobile Menu --}}
     <div x-show="mobileMenu" x-cloak class="lg:hidden bg-[#34495e] border-t border-white/10 p-4 space-y-2">
-        <a href="{{ route('user.home') }}" class="block p-3 text-white font-bold bg-white/10 rounded-lg">Beranda</a>
-        <a href="{{ route('user.dashboard') }}" class="block p-3 text-white font-medium hover:bg-white/10 rounded-lg">Dashboard Saya</a>
+        <a href="{{ route('user.home') }}" class="block p-3 text-white font-medium hover:bg-white/10 rounded-lg">Beranda</a>
+        <a href="{{ route('user.dashboard') }}" class="block p-3 text-white font-bold bg-white/10 rounded-lg">Dashboard Saya</a>
     </div>
 </header>
 
@@ -210,9 +224,7 @@
                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
                                 <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($laporan->tgl_lapor)->format('d M Y') }}
                             </span>
-                            <span class="status-badge {{ $laporan->status == 'selesai' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600' }}">
-                                {{ $laporan->status }}
-                            </span>
+                            <span class="text-[10px] font-bold {{ $laporan->status == 'selesai' ? 'text-green-500' : 'text-yellow-500' }} uppercase">{{ $laporan->status }}</span>
                         </div>
                         <h3 class="font-bold text-gray-800 mb-2 text-lg line-clamp-1 capitalize">{{ $laporan->judul_laporan }}</h3>
                         <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed italic mb-4">"{{ $laporan->deskripsi }}"</p>
@@ -246,8 +258,8 @@
         </div>
     </div>
 </main>
-<footer class="py-8 text-center text-gray-400 text-xs font-medium border-t bg-white mt-12">
-    &copy; {{ date('Y') }} Crime Alert Report. Seluruh hak cipta dilindungi.
+<footer class="mt-auto py-8 text-center text-gray-400 text-xs font-medium">
+    &copy; {{ date('Y') }} Crime Alert Report System. Seluruh hak cipta dilindungi.
 </footer>
 </body>
 </html>

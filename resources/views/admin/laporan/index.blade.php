@@ -269,5 +269,9 @@
     </div>
 </div>
 
+<footer class="mt-auto py-8 text-center text-gray-400 text-xs font-medium">
+    &copy; {{ date('Y') }} Crime Alert Report System. Seluruh hak cipta dilindungi.
+</footer>
+
 </body>
 </html>

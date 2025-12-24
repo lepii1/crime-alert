@@ -78,7 +78,7 @@
 </table>
 
 <div class="footer">
-    Dicetak pada: {{ date('d F Y H:i') }} &bull; Crime Alert Admin System
+    Dicetak pada: {{ date('d F Y H:i') }} &bull; Crime Alert Admin System. Seluruh hak cipta dilindungi.
 </div>
 
 </body>

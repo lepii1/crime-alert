@@ -185,8 +185,8 @@
     </div>
 </div>
 
-<footer class="py-12 text-center text-gray-400 text-[10px] font-bold uppercase tracking-[0.3em]">
-    Crime Alert Security System &bull; Administrative Portal {{ date('Y') }}
+<footer class="mt-auto py-8 text-center text-gray-400 text-xs font-medium">
+    &copy; {{ date('Y') }} Crime Alert Report System. Seluruh hak cipta dilindungi.
 </footer>
 
 </body>

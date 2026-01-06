@@ -132,6 +132,8 @@
                             <option value="Kekerasan" {{ old('kategori') == 'Kekerasan' ? 'selected' : '' }}>Kekerasan</option>
                             <option value="Penipuan" {{ old('kategori') == 'Penipuan' ? 'selected' : '' }}>Penipuan</option>
                             <option value="Pelecehan" {{ old('kategori') == 'Pelecehan' ? 'selected' : '' }}>Pelecehan</option>
+                            <option value="Kecelakaan" {{ old('kategori') == 'Kecelakaan' ? 'selected' : '' }}>Kecelakaan</option>
+                            <option value="Kebakaran" {{ old('kategori') == 'Kebakaran' ? 'selected' : '' }}>Kebakaran</option>
                             <option value="Lain-lain" {{ old('kategori') == 'Lain-lain' ? 'selected' : '' }}>Lain-lain</option>
                         </select>
                         @error('kategori') <p class="error-text">{{ $message }}</p> @enderror

@@ -1,132 +1,4 @@
-{{--<!DOCTYPE html>--}}
-{{--<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">--}}
-{{--<head>--}}
-{{--    <meta charset="utf-8">--}}
-{{--    <meta name="viewport" content="width=device-width, initial-scale=1">--}}
-{{--    <title>Community Feed - Crime Alert</title>--}}
-{{--    @vite(['resources/css/app.css', 'resources/js/app.js'])--}}
-{{--    <style>--}}
-{{--        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');--}}
-{{--        body {--}}
-{{--            font-family: 'Poppins', sans-serif;--}}
-{{--            background-color: #f0f2f5;--}}
-{{--            margin: 0;--}}
-{{--            min-height: 100vh;--}}
-{{--        }--}}
-{{--        .header {--}}
-{{--            background-color: #2c3e50;--}}
-{{--            color: #ecf0f1;--}}
-{{--        }--}}
-{{--        .header-logo {--}}
-{{--            color: #e74c3c;--}}
-{{--        }--}}
-{{--        .nav-link {--}}
-{{--            @apply px-3 py-2 rounded-lg transition text-sm font-medium;--}}
-{{--        }--}}
-{{--        .nav-link:hover {--}}
-{{--            background-color: rgba(255, 255, 255, 0.1);--}}
-{{--        }--}}
-{{--        .nav-link.active {--}}
-{{--            background-color: rgba(255, 255, 255, 0.2);--}}
-{{--            color: #fff;--}}
-{{--        }--}}
-{{--        .status-badge {--}}
-{{--            @apply px-2 py-1 rounded-full text-[10px] font-bold uppercase;--}}
-{{--        }--}}
-{{--        .report-card {--}}
-{{--            @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition hover:shadow-md;--}}
-{{--        }--}}
-{{--        .main-content-wrapper {--}}
-{{--            max-width: 7xl;--}}
-{{--            margin-left: auto;--}}
-{{--            margin-right: auto;--}}
-{{--            padding-left: 1rem;--}}
-{{--            padding-right: 1rem;--}}
-{{--        }--}}
-{{--    </style>--}}
-{{--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">--}}
-{{--</head>--}}
-{{--<body>--}}
-{{--<header class="header shadow-lg">--}}
-{{--    <div class="main-content-wrapper py-4 flex justify-between items-center">--}}
-{{--        <div class="flex items-center">--}}
-{{--            <ul>--}}
-{{--                <li><a href="{{ url('/') }}"><i class="fas fa-exclamation-circle mr-3 header-logo text-2xl"></i> <span class="text-white text-xl font-semibold"> CRIME ALERT - BERANDA</span></a></li>--}}
-{{--            </ul>--}}
-{{--            <h1 class="text-xl font-semibold sm:hidden">DASHBOARD</h1>--}}
-{{--        </div>--}}
-
-{{--        <div class="flex items-center space-x-4">--}}
-{{--            <a href="{{route('user.dashboard') }}" class="px-3 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition text-sm">--}}
-{{--                Dashboard--}}
-{{--            </a>--}}
-
-{{--            <a href="{{ route('laporan.create') }}" class="px-3 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm whitespace-nowrap">--}}
-{{--                <i class="fas fa-plus  mr-1"></i> Buat Laporan--}}
-{{--            </a>--}}
-
-{{--            --}}{{-- LOGOUT --}}
-{{--            <form method="POST" action="{{ route('logout') }}">--}}
-{{--                @csrf--}}
-{{--                <button type="submit" class="text-sm hover:text-gray-300 transition whitespace-nowrap">--}}
-{{--                    <i class="fas fa-sign-out-alt mr-1"></i> Logout--}}
-{{--                </button>--}}
-{{--            </form>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--</header>--}}
-
-{{--<main class="py-10">--}}
-{{--    <div class="max-w-7xl mx-auto px-6">--}}
-{{--        <div class="mb-8">--}}
-{{--            <h2 class="text-2xl font-bold text-gray-800">Laporan Komunitas</h2>--}}
-{{--            <p class="text-sm text-gray-500">Melihat kejadian terkini yang dilaporkan oleh warga sekitar.</p>--}}
-{{--        </div>--}}
-
-{{--        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">--}}
-{{--            @forelse($laporans as $laporan)--}}
-{{--                <div class="report-card flex flex-col">--}}
-{{--                    <div class="h-48 bg-gray-200 relative overflow-hidden">--}}
-{{--                        @if($laporan->bukti_kejadian)--}}
-{{--                            <img src="{{ asset('storage/' . $laporan->bukti_kejadian) }}" class="w-full h-full object-cover">--}}
-{{--                        @else--}}
-{{--                            <div class="flex items-center justify-center h-full text-gray-400"><i class="fas fa-image text-3xl"></i></div>--}}
-{{--                        @endif--}}
-{{--                        <div class="absolute top-3 left-3">--}}
-{{--                            <span class="status-badge bg-white shadow-sm text-gray-700">{{ $laporan->kategori }}</span>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="p-5 flex-grow">--}}
-{{--                        <div class="flex items-center justify-between mb-2">--}}
-{{--                            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ \Carbon\Carbon::parse($laporan->tgl_lapor)->format('d M Y') }}</span>--}}
-{{--                            <span class="text-[10px] font-bold {{ $laporan->status == 'selesai' ? 'text-green-500' : 'text-yellow-500' }} uppercase">{{ $laporan->status }}</span>--}}
-{{--                        </div>--}}
-{{--                        <h3 class="font-bold text-gray-800 mb-2 line-clamp-1">{{ $laporan->judul_laporan }}</h3>--}}
-{{--                        <p class="text-xs text-gray-600 line-clamp-2 mb-4">{{ $laporan->deskripsi }}</p>--}}
-{{--                        <p class="text-xs text-gray-600 line-clamp-2 mb-4">{{ $laporan->lokasi_kejadian }}</p>--}}
-{{--                        <div class="pt-4 border-t flex items-center justify-between">--}}
-{{--                            <div class="flex items-center">--}}
-{{--                                <div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center text-[10px] font-bold text-indigo-600 mr-2">--}}
-{{--                                    {{ substr($laporan->user->name, 0, 1) }}--}}
-{{--                                </div>--}}
-{{--                                <span class="text-[11px] font-medium text-gray-500">{{ $laporan->user->name }}</span>--}}
-{{--                            </div>--}}
-{{--                            <a href="{{ route('laporan.show', $laporan->id) }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800">Detail <i class="fas fa-arrow-right ml-1"></i></a>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            @empty--}}
-{{--                <div class="col-span-full py-20 text-center bg-white rounded-xl shadow-sm border border-dashed border-gray-300">--}}
-{{--                    <p class="text-gray-400">Belum ada laporan yang dibagikan.</p>--}}
-{{--                </div>--}}
-{{--            @endforelse--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--</main>--}}
-{{--</body>--}}
-{{--</html>--}}
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -139,7 +11,16 @@
         body { font-family: 'Poppins', sans-serif; background-color: #f0f2f5; margin: 0; min-height: 100vh; }
         .header { background-color: #2c3e50; color: #ecf0f1; }
         .header-logo { color: #e74c3c; }
-        .status-badge { @apply px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm; }
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        /* Warna Badge Status */
+        .status-pending {  color: #eaca55; }
+        .status-proses {  color: #4f46e3; }
+        .status-selesai {  color: #22c45d; }
         .report-card { @apply bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
         .nav-item { @apply flex items-center px-4 py-2 rounded-xl transition-all duration-200 text-sm font-medium hover:bg-white/10; }
         .nav-item.active { @apply bg-white/20 text-white font-bold; }
@@ -224,7 +105,7 @@
                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
                                 <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($laporan->tgl_lapor)->format('d M Y') }}
                             </span>
-                            <span class="text-[10px] font-bold {{ $laporan->status == 'selesai' ? 'text-green-500' : 'text-yellow-500' }} uppercase">{{ $laporan->status }}</span>
+                            <span class="status-badge status-{{ strtolower($laporan->status) }}">{{ ucfirst($laporan->status) }}</span>
                         </div>
                         <h3 class="font-bold text-gray-800 mb-2 text-lg line-clamp-1 capitalize">{{ $laporan->judul_laporan }}</h3>
                         <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed italic mb-4">"{{ $laporan->deskripsi }}"</p>

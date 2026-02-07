@@ -44,6 +44,8 @@ class LaporanController extends Controller
             'foto_identitas' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'lokasi_kejadian' => 'required|string',
             'confirm' => 'accepted', // Menggunakan accepted untuk checkbox
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ], [
             // Pesan custom agar mudah didebug
             'confirm.accepted' => 'Anda harus menyetujui konfirmasi laporan.',
@@ -64,6 +66,8 @@ class LaporanController extends Controller
             'tgl_lapor' => $request->tgl_lapor,
             'lokasi_kejadian' => $request->lokasi_kejadian,
             'ip_terlapor' => $request->ip_terlapor ?? $request->ip(), // Fallback ke IP server jika JS gagal
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'bukti_kejadian' => $buktiPath,
             'foto_identitas' => $identitasPath,
             'status' => 'pending',

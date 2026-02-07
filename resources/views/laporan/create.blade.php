@@ -11,6 +11,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
@@ -57,6 +61,17 @@
         .nav-item.active {
             @apply bg-white/20 text-white font-bold;
         }
+        #map {
+            height: 350px;
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #edf2f7;
+            margin-top: 10px;
+            z-index: 1;
+        }
+        .btn-gps {
+            @apply mt-2 inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-indigo-100 transition;
+        }
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -85,8 +100,6 @@
             </form>
         </div>
     </div>
-
-
 </header>
 
 <main class="py-12">
@@ -98,6 +111,9 @@
             </div>
             <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data" id="reportForm" class="space-y-8">
                 @csrf
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
 
                 <div>
                     <label class="block font-medium text-gray-700 mb-1">Judul Laporan</label>
@@ -115,10 +131,17 @@
                 </div>
 
                 <div>
-                    <label class="block font-medium text-gray-700 mb-1">Lokasi Kejadian</label>
-                    <input type="text" name="lokasi_kejadian" value="{{ old('lokasi_kejadian') }}"
+                    <label class="block font-medium text-gray-700 mb-1">Lokasi Kejadian (Peta & Teks)</label>
+                    <input type="text" name="lokasi_kejadian" value="{{ old('lokasi_kejadian') }}" required
                            class="w-full border border-gray-300 p-2.5 rounded-lg shadow-sm transition duration-200 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 focus:ring-opacity-75">
-                    @error('lokasi_kejadian') <p class="error-text">{{ $message }}</p> @enderror
+
+                    <button type="button" onclick="getLocation()" class="btn-gps">
+                        <i class="fas fa-crosshairs mr-2"></i> Gunakan Lokasi Saya Sekarang (GPS)
+                    </button>
+
+                    <div id="map"></div>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase italic mt-2">*Klik pada peta atau geser penanda untuk menentukan titik koordinat tepat kejadian.</p>
+                    @error('latitude') <p class="error-text">Koordinat lokasi wajib ditentukan pada peta.</p> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
@@ -146,7 +169,6 @@
                     </div>
                 </div>
 
-                {{-- Lampiran Foto --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t">
                     <div>
                         <label class="label-text flex items-center">
@@ -173,18 +195,7 @@
                     </div>
                 </div>
 
-                {{-- Metadata Otomatis --}}
-                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100 flex items-center">
-                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 mr-4 shadow-sm">
-                        <i class="fas fa-fingerprint"></i>
-                    </div>
-                    <div>
-                        <label class="label-text mb-0">Audit Sistem (IP Address)</label>
-                        <input type="text" id="ip_terlapor" name="ip_terlapor" readonly class="bg-transparent border-none p-0 focus:ring-0 cursor-default text-xs font-mono text-gray-400 font-bold w-full">
-                    </div>
-                </div>
 
-                {{-- Konfirmasi & Submit --}}
                 <div class="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-8">
                     <div class="flex items-start bg-yellow-50 p-4 rounded-2xl border border-yellow-100">
                         <input type="checkbox" id="confirm" name="confirm" required class="mt-1 h-5 w-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 cursor-pointer">
@@ -207,6 +218,60 @@
 </footer>
 
 <script>
+    // Inisialisasi Peta
+    let defaultLat = -6.2088; // Koordinat Default (Jakarta)
+    let defaultLng = 106.8456;
+
+    const map = L.map('map').setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([defaultLat, defaultLng], {
+        draggable: true
+    }).addTo(map);
+
+    // Update Hidden Input Koordinat
+    function updateCoords(lat, lng) {
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+    }
+
+    updateCoords(defaultLat, defaultLng);
+
+    // Event Marker Digeser
+    marker.on('dragend', function(e) {
+        let pos = marker.getLatLng();
+        updateCoords(pos.lat, pos.lng);
+    });
+
+    // Event Peta Diklik
+    map.on('click', function(e) {
+        let lat = e.latlng.lat;
+        let lng = e.latlng.lng;
+        marker.setLatLng([lat, lng]);
+        updateCoords(lat, lng);
+    });
+
+    // Fungsi Ambil GPS Otomatis
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+                map.setView([lat, lng], 17);
+                marker.setLatLng([lat, lng]);
+                updateCoords(lat, lng);
+            }, function() {
+                alert("Gagal mengambil lokasi. Mohon izinkan akses lokasi pada browser Anda.");
+            });
+        } else {
+            alert("Geolocation tidak didukung oleh browser Anda.");
+        }
+    }
+
+    // Logic Checkbox & IP
     document.addEventListener('DOMContentLoaded', function() {
         const confirmCheckbox = document.getElementById('confirm');
         const submitBtn = document.getElementById('submitBtn');

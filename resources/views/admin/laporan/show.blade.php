@@ -40,7 +40,7 @@
         .value-text { @apply text-sm font-bold text-gray-800; }
 
         .img-preview { @apply w-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md cursor-zoom-in object-contain bg-gray-50; max-height: 350px; }
-        #map { height: 300px; border-radius: 20px; border: 1px solid #edf2f7; }
+        #map { height: 300px; border-radius: 8px; }
 
         .select-custom { @apply bg-gray-50 border border-gray-100 text-gray-700 text-xs rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 outline-none font-bold uppercase tracking-tighter; }
     </style>
@@ -163,17 +163,19 @@
                         @endif
                     </div>
                     <div class="card-detail">
-                        <span class="label-text mb-4">Titik Koordinat (Peta)</span>
+                        <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest flex items-center">
+                            <i class="fas fa-map-marked-alt mr-2"></i> Titik Lokasi Kejadian
+                        </h3>
                         @if($laporan->latitude && $laporan->longitude)
-                            <div id="map"></div>
-                            <div class="mt-3 flex justify-between items-center text-[10px] font-mono text-gray-400 uppercase font-bold">
+                            <div id="map" class="shadow-inner border border-gray-100"></div>
+                            <div class="mt-3 flex justify-between items-center text-[10px] font-mono text-gray-500">
                                 <span>GPS: {{ $laporan->latitude }}, {{ $laporan->longitude }}</span>
-                                <a href="https://www.google.com/maps?q={{ $laporan->latitude }},{{ $laporan->longitude }}" target="_blank" class="text-indigo-500 hover:underline">Buka di Maps <i class="fas fa-external-link-alt ml-1"></i></a>
+                                <a href="https://www.google.com/maps?q={{ $laporan->latitude }},{{ $laporan->longitude }}" target="_blank" class="text-blue-600 font-bold hover:underline italic">BUKA GOOGLE MAPS</a>
                             </div>
                         @else
-                            <div class="bg-gray-50 h-48 rounded-2xl flex flex-col items-center justify-center text-gray-300 border-2 border-dashed">
-                                <i class="fas fa-map-marked-alt text-4xl mb-2"></i>
-                                <span class="text-[10px] font-bold uppercase">Koordinat Tidak Tersedia</span>
+                            <div class="bg-gray-100 h-48 rounded-xl flex flex-col items-center justify-center text-gray-400 border-2 border-dashed">
+                                <i class="fas fa-map-marker-slash text-3xl mb-2"></i>
+                                <span class="text-xs font-medium uppercase">Koordinat tidak tersedia</span>
                             </div>
                         @endif
                     </div>
@@ -246,7 +248,7 @@
                                 @csrf
                                 <label class="label-text mb-3 text-red-600">Belum Ada Petugas Ditugaskan</label>
                                 <div class="space-y-4">
-                                    <select name="polisi_id" required class="select-custom">
+                                    <select name="polisi_id" required class="w-full border-gray-300 rounded-md shadow-sm">
                                         <option value="" disabled selected>-- Pilih Petugas --</option>
                                         @foreach($polisis as $p)
                                             <option value="{{ $p->id }}">{{ $p->nama }} ({{ $p->jabatan }})</option>
@@ -282,12 +284,16 @@
             const map = L.map('map', {
                 center: [lat, lng],
                 zoom: 15,
-                scrollWheelZoom: false
+                scrollWheelZoom: false // Hindari scroll yang tidak sengaja
             });
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-            L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Kejadian').openPopup();
+
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('<b>Lokasi Kejadian</b><br>Laporan #{{ $laporan->id }}')
+                .openPopup();
         }
     });
 </script>

@@ -144,7 +144,7 @@
                         @if($laporan->latitude && $laporan->longitude)
                             <div id="map" class="shadow-inner border border-gray-100"></div>
                             <div class="mt-3 flex justify-between items-center text-[10px] font-mono text-gray-500">
-                                <span>坐标: {{ $laporan->latitude }}, {{ $laporan->longitude }}</span>
+                                <span>GPS: {{ $laporan->latitude }}, {{ $laporan->longitude }}</span>
                                 <a href="https://www.google.com/maps?q={{ $laporan->latitude }},{{ $laporan->longitude }}" target="_blank" class="text-blue-600 font-bold hover:underline italic">BUKA GOOGLE MAPS</a>
                             </div>
                         @else

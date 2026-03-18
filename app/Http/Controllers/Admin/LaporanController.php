@@ -160,4 +160,15 @@ class LaporanController extends Controller
         $laporan->update(['polisi_id' => $request->polisi_id, 'status' => 'proses']);
         return redirect()->route('admin.laporan.show', $laporan->id)->with('success', 'Laporan berhasil ditugaskan.');
     }
+
+    public function crimeMap()
+    {
+        // Mengambil semua laporan yang memiliki koordinat
+        $laporans = Laporan::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->with('user')
+            ->get();
+
+        return view('admin.laporan.map', compact('laporans'));
+    }
 }

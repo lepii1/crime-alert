@@ -11,9 +11,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Leaflet Map CSS & JS -->
+    <!-- Leaflet Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -217,10 +216,13 @@
     &copy; {{ date('Y') }} Crime Alert Report System. Seluruh hak cipta dilindungi.
 </footer>
 
+{{-- Leaflet Map Script --}}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
     // Inisialisasi Peta
-    let defaultLat = -6.2088; // Koordinat Default (Jakarta)
-    let defaultLng = 106.8456;
+    let defaultLat = -6.17700718; // Koordinat Default (Jakarta)
+    let defaultLng = -973.17308795;
 
     const map = L.map('map').setView([defaultLat, defaultLng], 13);
 

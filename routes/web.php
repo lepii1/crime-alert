@@ -31,6 +31,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::post('/sos/public', [App\Http\Controllers\LaporanController::class, 'publicSosStore'])->name('public.sos');
+
 /*
 |--------------------------------------------------------------------------
 | Halaman Admin & User (bisa diakses langsung kalau login)
